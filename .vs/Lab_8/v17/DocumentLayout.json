@@ -1,0 +1,330 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Admin\\source\\repos\\Lab_8\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\utils\\dataseeder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:utils\\dataseeder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|c:\\users\\admin\\source\\repos\\lab_8\\models\\quizdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:models\\quizdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\models\\useranswer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:models\\useranswer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\models\\question.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:models\\question.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\models\\quiz.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:models\\quiz.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\forms\\login.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:forms\\login.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\forms\\login.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:forms\\login.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\migrations\\20251104120010_initdatabase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:migrations\\20251104120010_initdatabase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\forms\\login.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:forms\\login.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\forms\\userquiz.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:forms\\userquiz.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\models\\answer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:models\\answer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\models\\history.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:models\\history.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\forms\\userquiz.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:forms\\userquiz.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|C:\\Users\\Admin\\source\\repos\\Lab_8\\forms\\userquiz.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3094E67E-4BCD-48E9-986B-6941CE357174}|Lab_8.csproj|solutionrelative:forms\\userquiz.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "UserService.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Services\\UserService.cs",
+              "RelativeDocumentMoniker": "Services\\UserService.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Services\\UserService.cs",
+              "RelativeToolTip": "Services\\UserService.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAQwBoAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T09:15:07.679Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "DataSeeder.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Utils\\DataSeeder.cs",
+              "RelativeDocumentMoniker": "Utils\\DataSeeder.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Utils\\DataSeeder.cs",
+              "RelativeToolTip": "Utils\\DataSeeder.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAQwB0AAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T09:16:01.849Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "UserAnswer.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Models\\UserAnswer.cs",
+              "RelativeDocumentMoniker": "Models\\UserAnswer.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Models\\UserAnswer.cs",
+              "RelativeToolTip": "Models\\UserAnswer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T08:20:48.957Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Login.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Forms\\Login.cs",
+              "RelativeDocumentMoniker": "Forms\\Login.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Forms\\Login.cs",
+              "RelativeToolTip": "Forms\\Login.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAsAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T11:51:03.265Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Question.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Models\\Question.cs",
+              "RelativeDocumentMoniker": "Models\\Question.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Models\\Question.cs",
+              "RelativeToolTip": "Models\\Question.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAuwA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T07:58:11.896Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "QuizDBContext.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Models\\QuizDBContext.cs",
+              "RelativeDocumentMoniker": "Models\\QuizDBContext.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Models\\QuizDBContext.cs",
+              "RelativeToolTip": "Models\\QuizDBContext.cs",
+              "ViewState": "AgIAAD0AAAAAAAAAAADwvwMAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T08:39:46.231Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Models\\User.cs",
+              "RelativeDocumentMoniker": "Models\\User.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Models\\User.cs",
+              "RelativeToolTip": "Models\\User.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAAwAYAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T07:54:08.752Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Quiz.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Models\\Quiz.cs",
+              "RelativeDocumentMoniker": "Models\\Quiz.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Models\\Quiz.cs",
+              "RelativeToolTip": "Models\\Quiz.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAAwAMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T08:00:06.382Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "App.config",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\App.config",
+              "RelativeDocumentMoniker": "App.config",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\App.config",
+              "RelativeToolTip": "App.config",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
+              "WhenOpened": "2025-11-04T09:20:04.108Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Login.cs [Design]",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Forms\\Login.cs",
+              "RelativeDocumentMoniker": "Forms\\Login.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Forms\\Login.cs [Design]",
+              "RelativeToolTip": "Forms\\Login.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T09:10:34.457Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T09:30:53.713Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Login.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Forms\\Login.Designer.cs",
+              "RelativeDocumentMoniker": "Forms\\Login.Designer.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Forms\\Login.Designer.cs",
+              "RelativeToolTip": "Forms\\Login.Designer.cs",
+              "ViewState": "AgIAADMAAAAAAAAAAAAYwEEAAAA+AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T11:50:25.446Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "20251104120010_InitDatabase.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Migrations\\20251104120010_InitDatabase.cs",
+              "RelativeDocumentMoniker": "Migrations\\20251104120010_InitDatabase.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Migrations\\20251104120010_InitDatabase.cs",
+              "RelativeToolTip": "Migrations\\20251104120010_InitDatabase.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAxwAwAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T12:00:11.369Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "UserQuiz.cs [Design]",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Forms\\UserQuiz.cs",
+              "RelativeDocumentMoniker": "Forms\\UserQuiz.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Forms\\UserQuiz.cs [Design]",
+              "RelativeToolTip": "Forms\\UserQuiz.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T07:46:33.586Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "Answer.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Models\\Answer.cs",
+              "RelativeDocumentMoniker": "Models\\Answer.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Models\\Answer.cs",
+              "RelativeToolTip": "Models\\Answer.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAUwBkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T07:58:18.922Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "History.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Models\\History.cs",
+              "RelativeDocumentMoniker": "Models\\History.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Models\\History.cs",
+              "RelativeToolTip": "Models\\History.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAywCkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T08:17:28.384Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "UserQuiz.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Forms\\UserQuiz.Designer.cs",
+              "RelativeDocumentMoniker": "Forms\\UserQuiz.Designer.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Forms\\UserQuiz.Designer.cs",
+              "RelativeToolTip": "Forms\\UserQuiz.Designer.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAAwBQAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T07:47:14.027Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "UserQuiz.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Forms\\UserQuiz.cs",
+              "RelativeDocumentMoniker": "Forms\\UserQuiz.cs",
+              "ToolTip": "C:\\Users\\Admin\\source\\repos\\Lab_8\\Forms\\UserQuiz.cs",
+              "RelativeToolTip": "Forms\\UserQuiz.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-04T07:46:34.915Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
