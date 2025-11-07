@@ -15,7 +15,7 @@ namespace Lab_8.Utils
             context.Database.EnsureCreated();
 
             // Stop if already seeded
-            if (context.Users.Any())
+            if (context.Users.Any() || context.Quizzes.Any())
                 return;
 
             // Path to images folder
@@ -96,7 +96,6 @@ namespace Lab_8.Utils
                 TimeStart = DateTime.Now.AddMinutes(-5),
                 TimeFinish = DateTime.Now,
                 TotalScore = 100,
-                Image = null
             };
 
             context.Histories.Add(history);

@@ -69,8 +69,7 @@ namespace Lab_8.Migrations
                     IsFinish = table.Column<bool>(nullable: false),
                     TimeStart = table.Column<DateTime>(nullable: false),
                     TimeFinish = table.Column<DateTime>(nullable: false),
-                    TotalScore = table.Column<double>(nullable: false),
-                    Image = table.Column<byte[]>(nullable: true)
+                    TotalScore = table.Column<double>(nullable: false)
                 },
                 constraints: table =>
                 {

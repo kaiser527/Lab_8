@@ -1,11 +1,17 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using Lab_8.Forms;
 using Lab_8.Services;
+using Lab_8.Utils;
+using System;
+using System.Windows.Forms;
 
 namespace Lab_8
 {
     public partial class Login : Form
     {
+        private readonly bool _isPlaceholderUsernameApplied = false;
+
+        private readonly bool _isPlaceholderPasswordApplied = false;
+
         private bool isLoading;
         private bool IsLoading
         {
@@ -22,6 +28,11 @@ namespace Lab_8
         public Login()
         {
             InitializeComponent();
+
+            UIStyle.ApplyPlaceholder(textBoxUsername, "Account Username...", ref _isPlaceholderUsernameApplied);
+
+            textBoxPassword.UseSystemPasswordChar = false;
+            UIStyle.ApplyPlaceholder(textBoxPassword, "Account Password...", ref _isPlaceholderPasswordApplied);
         }
 
         #region Methods
@@ -32,7 +43,8 @@ namespace Lab_8
             string username = textBoxUsername.Text.Trim();
             string password = textBoxPassword.Text.Trim();
 
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password) ||
+                textBoxUsername.Text == "Account Username..." || textBoxPassword.Text == "Account Password...")
             {
                 MessageBox.Show("Missing information", "Alert");
                 return;
@@ -46,9 +58,9 @@ namespace Lab_8
 
                 if (user != null && success)
                 {
-                    UserQuiz userQuiz = new UserQuiz();
+                    Home home = new Home();
                     Hide();
-                    userQuiz.ShowDialog();
+                    home.ShowDialog();
                     Show();
                 }
                 else
@@ -89,5 +101,17 @@ namespace Lab_8
             }
         }
         #endregion
+
+        private void textBoxPassword_TextChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(textBoxPassword.Text) || textBoxPassword.Text == "Account Password...")
+            {
+                textBoxPassword.UseSystemPasswordChar = false;
+            }
+            else
+            {
+                textBoxPassword.UseSystemPasswordChar = true;
+            }
+        }
     }
 }
