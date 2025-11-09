@@ -43,9 +43,9 @@
             // historyPanel
             // 
             this.historyPanel.BackColor = System.Drawing.Color.White;
-            this.historyPanel.Location = new System.Drawing.Point(797, 37);
+            this.historyPanel.Location = new System.Drawing.Point(803, 37);
             this.historyPanel.Name = "historyPanel";
-            this.historyPanel.Size = new System.Drawing.Size(403, 745);
+            this.historyPanel.Size = new System.Drawing.Size(397, 745);
             this.historyPanel.TabIndex = 1;
             // 
             // tootStripHome
@@ -88,13 +88,13 @@
             // userProfileToolStripMenuItem
             // 
             this.userProfileToolStripMenuItem.Name = "userProfileToolStripMenuItem";
-            this.userProfileToolStripMenuItem.Size = new System.Drawing.Size(224, 30);
+            this.userProfileToolStripMenuItem.Size = new System.Drawing.Size(188, 30);
             this.userProfileToolStripMenuItem.Text = "User Profile";
             // 
             // logoutToolStripItem
             // 
             this.logoutToolStripItem.Name = "logoutToolStripItem";
-            this.logoutToolStripItem.Size = new System.Drawing.Size(224, 30);
+            this.logoutToolStripItem.Size = new System.Drawing.Size(188, 30);
             this.logoutToolStripItem.Text = "Logout";
             // 
             // flpQuiz
@@ -102,7 +102,7 @@
             this.flpQuiz.BackColor = System.Drawing.Color.White;
             this.flpQuiz.Location = new System.Drawing.Point(12, 37);
             this.flpQuiz.Name = "flpQuiz";
-            this.flpQuiz.Size = new System.Drawing.Size(779, 667);
+            this.flpQuiz.Size = new System.Drawing.Size(785, 667);
             this.flpQuiz.TabIndex = 3;
             // 
             // paginatePanel
@@ -110,7 +110,7 @@
             this.paginatePanel.BackColor = System.Drawing.Color.White;
             this.paginatePanel.Location = new System.Drawing.Point(12, 710);
             this.paginatePanel.Name = "paginatePanel";
-            this.paginatePanel.Size = new System.Drawing.Size(779, 72);
+            this.paginatePanel.Size = new System.Drawing.Size(785, 72);
             this.paginatePanel.TabIndex = 4;
             // 
             // Home

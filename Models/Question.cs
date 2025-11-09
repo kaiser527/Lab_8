@@ -18,6 +18,6 @@ namespace Lab_8.Models
         [ForeignKey("QuizId")]
         public Quiz Quiz { get; set; }
 
-        public ICollection<Answer> Answers { get; set; }
+        public ICollection<Answer> Answers { get; set; } = new List<Answer>();
     }
 }

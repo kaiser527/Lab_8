@@ -23,8 +23,8 @@ namespace Lab_8.Models
         [Column(TypeName = "VARBINARY(MAX)")]
         public byte[] Image { get; set; }
 
-        public ICollection<History> Histories { get; set; }
+        public ICollection<History> Histories { get; set; } = new List<History>();
 
-        public ICollection<UserAnswer> UserAnswers { get; set; }
+        public ICollection<UserAnswer> UserAnswers { get; set; } = new List<UserAnswer>();
     }
 }

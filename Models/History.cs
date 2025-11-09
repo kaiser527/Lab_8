@@ -34,6 +34,6 @@ namespace Lab_8.Models
         [ForeignKey("UserId")]
         public User User { get; set; }
 
-        public ICollection<UserAnswer> UserAnswers { get; set; }
+        public ICollection<UserAnswer> UserAnswers { get; set; } = new List<UserAnswer>();  
     }
 }

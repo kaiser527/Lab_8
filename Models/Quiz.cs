@@ -17,11 +17,11 @@ namespace Lab_8.Models
         [MaxLength(100)]
         public string Difficulty { get; set; }
 
-        public ICollection<Question> Questions { get; set; }
+        public ICollection<Question> Questions { get; set; } = new List<Question>();
 
         [Column(TypeName = "VARBINARY(MAX)")]
         public byte[] Image { get; set; }
 
-        public ICollection<History> Histories { get; set; }
+        public ICollection<History> Histories { get; set; } = new List<History>();
     }
 }

@@ -12,7 +12,7 @@ namespace Lab_8.Forms
     public partial class Home : Form
     {
         private int _currentPage = 1;
-        private readonly int _pageSize = 10;
+        private readonly int _pageSize = 6;
         private int _totalPages = 1;
 
         public Home()
@@ -23,7 +23,7 @@ namespace Lab_8.Forms
         }
 
         #region Methods
-        private async Task LoadQuiz()
+        public async Task LoadQuiz()
         {
             flpQuiz.Controls.Clear();
 
@@ -297,7 +297,7 @@ namespace Lab_8.Forms
 
         private void toolStripAdminBtn_Click(object sender, EventArgs e)
         {
-            Admin admin = new Admin();
+            Admin admin = new Admin(this);
 
             admin.ShowDialog(); 
         }
