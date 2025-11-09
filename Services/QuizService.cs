@@ -59,6 +59,25 @@ namespace Lab_8.Services
             }
         }
 
+        public async Task<Quiz> GetQuizById(int quizId)
+        {
+            using (var context = new QuizDBContext())
+            {
+                Quiz existingQuiz = await context.Quizzes
+                    .Include(q => q.Questions)
+                        .ThenInclude(q => q.Answers)  
+                    .FirstOrDefaultAsync(q => q.Id == quizId);
+
+                if (existingQuiz == null)
+                {
+                    MessageBox.Show("Quiz is not exists", "Error");
+                    return null;
+                }
+
+                return existingQuiz;    
+            }
+        }
+
         public async Task CreateQuiz(Quiz quiz)
         {
             using (var context = new QuizDBContext())
@@ -116,6 +135,14 @@ namespace Lab_8.Services
                     MessageBox.Show("Quiz is not exists", "Update failed");
                     return;
                 }
+
+                var histories = await context.Histories
+                    .Where(h => h.QuizId == quizId)
+                    .Include(h => h.UserAnswers)
+                    .ToListAsync();
+
+                context.UserAnswers.RemoveRange(histories.SelectMany(h => h.UserAnswers));
+                context.Histories.RemoveRange(histories);
 
                 context.Quizzes.Remove(existingQuiz);
 

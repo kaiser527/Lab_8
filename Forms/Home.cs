@@ -34,7 +34,7 @@ namespace Lab_8.Forms
 
             foreach (var quiz in result.Items)
             {
-                var card = CreateQuizCard(quiz);
+                var card = await CreateQuizCard(quiz);
                 flpQuiz.Controls.Add(card);
             }
 
@@ -57,7 +57,7 @@ namespace Lab_8.Forms
             UIStyle.RoundPanel(flpQuiz, 15);
         }
 
-        private async Task ShowHistoryAsync(int quizId)
+        public async Task ShowHistoryAsync(int quizId)
         {
             historyPanel.Controls.Clear();
 
@@ -103,7 +103,7 @@ namespace Lab_8.Forms
 
                 Label lblDate = new Label
                 {
-                    Text = $"📅 Date: {h.TimeFinish:yyyy-MM-dd HH:mm}",
+                    Text = $"📅 Date: {(h.IsFinish ? h.TimeFinish.ToString("yyyy-MM-dd HH:mm") : h.TimeStart.ToString("yyyy-MM-dd HH:mm"))}",
                     Left = 10,
                     Top = 13,
                     AutoSize = true,
@@ -123,7 +123,7 @@ namespace Lab_8.Forms
                 {
                     Text = h.IsFinish ? "✅ Finished" : "⏳ In Progress",
                     AutoSize = true,
-                    Left = item.Width - 78,
+                    Left =  item.Width - ( h.IsFinish ? 78 : 91 ),
                     Top = 24,
                     Font = new Font("Segoe UI", 9, FontStyle.Italic),
                     ForeColor = h.IsFinish ? Color.FromArgb(0, 200, 83) : Color.FromArgb(255, 193, 7)
@@ -137,7 +137,7 @@ namespace Lab_8.Forms
             }
         }
 
-        private Control CreateQuizCard(Quiz quiz)
+        private async Task<Control> CreateQuizCard(Quiz quiz)
         {
             // Main card panel
             var card = new Panel
@@ -214,21 +214,21 @@ namespace Lab_8.Forms
 
             // Check if user has done this quiz before
             var user = UserService.Instance.User;
-            var history = user.Histories?
-                .Where(h => h.QuizId == quiz.Id)
-                .OrderByDescending(h => h.TimeFinish)
+            var histories = await HistoryService.Instance.GetListHistoryByQuizIdAndUserId(quiz.Id, user.Id);
+            var latestHistory = histories?
+                .OrderByDescending(h => h.IsFinish ? h.TimeFinish : h.TimeStart)
                 .FirstOrDefault();
 
             string buttonText;
             Color buttonColor;
 
             // 🧠 Determine state
-            if (history == null)
+            if (latestHistory == null)
             {
                 buttonText = "Enter";
                 buttonColor = Color.DodgerBlue;
             }
-            else if (history.IsFinish)
+            else if (latestHistory.IsFinish)
             {
                 buttonText = "Try Again";
                 buttonColor = Color.MediumSeaGreen;
@@ -254,6 +254,45 @@ namespace Lab_8.Forms
                 Cursor = Cursors.Hand
             };
             btnEnter.FlatAppearance.BorderSize = 0;
+
+            btnEnter.Click += async (s, e) =>
+            {
+                histories = await HistoryService.Instance.GetListHistoryByQuizIdAndUserId(quiz.Id, user.Id);
+                latestHistory = histories?
+                   .OrderByDescending(h => h.IsFinish ? h.TimeFinish : h.TimeStart)
+                   .FirstOrDefault();
+
+                History historyToUse = null;
+
+                if (latestHistory == null || latestHistory.IsFinish)
+                {
+                    // No history exists or previous quiz finished → create new history
+                    historyToUse = new History
+                    {
+                        UserId = user.Id,
+                        QuizId = quiz.Id,
+                        TimeStart = DateTime.Now,
+                        IsFinish = false,
+                        TotalScore = 0
+                    };
+
+                    await HistoryService.Instance.CreateUserHistory(historyToUse);
+
+                    // Immediately update button to "Continue"
+                    btnEnter.Text = "Continue";
+                    btnEnter.BackColor = Color.Orange;
+                }
+                else
+                {
+                    // Continue in-progress history
+                    historyToUse = latestHistory;
+                }
+
+                UserQuiz quizForm = new UserQuiz(quiz.Id, historyToUse.Id, this);
+                quizForm.ShowDialog();
+
+                _ = ShowHistoryAsync(quiz.Id);
+            };
 
             // Add all controls
             card.Controls.Add(pic);

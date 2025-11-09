@@ -1,6 +1,7 @@
 ﻿using Lab_8.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -31,8 +32,6 @@ namespace Lab_8.Services
             using (var context = new QuizDBContext())
             {
                 User user = await context.Users
-                    .Include(u => u.Histories)
-                        .ThenInclude(u => u.Quiz)
                     .FirstOrDefaultAsync(u => u.Email == email);
 
                 if (user == null) return (null, false);
@@ -131,6 +130,58 @@ namespace Lab_8.Services
 
                 context.Users.Remove(user);
                 await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task SaveUserAnswerEachCheck(UserAnswer userAnswer)
+        {
+            using (var context = new QuizDBContext())
+            {
+                // Get the QuestionId for the selected AnswerId
+                var questionId = await context.Answers
+                    .Where(a => a.Id == userAnswer.AnswerId)
+                    .Select(a => a.QuestionId)
+                    .FirstOrDefaultAsync();
+
+                // Find existing UserAnswer for this user, history, and question
+                var existing = await context.UserAnswers
+                    .Include(u => u.Answer)
+                    .FirstOrDefaultAsync(u =>
+                        u.UserId == userAnswer.UserId &&
+                        u.HistoryId == userAnswer.HistoryId &&
+                        u.Answer.QuestionId == questionId
+                    );
+
+                if (existing != null)
+                {
+                    // Delete old UserAnswer before inserting new one
+                    context.UserAnswers.Remove(existing);
+                    await context.SaveChangesAsync(); // save deletion first
+                }
+
+                // Add new UserAnswer
+                context.UserAnswers.Add(new UserAnswer
+                {
+                    UserId = userAnswer.UserId,
+                    HistoryId = userAnswer.HistoryId,
+                    AnswerId = userAnswer.AnswerId
+                });
+
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<UserAnswer>> GetUserAnswersByHistory(int historyId)
+        {
+            using (var context = new QuizDBContext())
+            {
+                var answers = await context.UserAnswers
+                    .Include(ua => ua.Answer)
+                        .ThenInclude(a => a.Question)
+                    .Where(ua => ua.HistoryId == historyId)
+                    .ToListAsync();
+
+                return answers;
             }
         }
     }
