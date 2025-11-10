@@ -10,8 +10,8 @@ namespace Lab_8
         private Label labelTitle;
         private Label labelUsername;
         private Label labelPassword;
-        private TextBox textBoxUsername;
-        private TextBox textBoxPassword;
+        private TextBox txbUserEmail;
+        private TextBox txbUserPassword;
         private Button btnLogin;
         private Button btnExit;
         private Panel panelMain;
@@ -29,8 +29,8 @@ namespace Lab_8
             this.labelTitle = new System.Windows.Forms.Label();
             this.labelUsername = new System.Windows.Forms.Label();
             this.labelPassword = new System.Windows.Forms.Label();
-            this.textBoxUsername = new System.Windows.Forms.TextBox();
-            this.textBoxPassword = new System.Windows.Forms.TextBox();
+            this.txbUserEmail = new System.Windows.Forms.TextBox();
+            this.txbUserPassword = new System.Windows.Forms.TextBox();
             this.btnLogin = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
             this.panelMain = new System.Windows.Forms.Panel();
@@ -69,25 +69,25 @@ namespace Lab_8
             this.labelPassword.TabIndex = 3;
             this.labelPassword.Text = "Password:";
             // 
-            // textBoxUsername
+            // txbUserEmail
             // 
-            this.textBoxUsername.Font = new System.Drawing.Font("Segoe UI", 11F);
-            this.textBoxUsername.Location = new System.Drawing.Point(140, 65);
-            this.textBoxUsername.Name = "textBoxUsername";
-            this.textBoxUsername.Size = new System.Drawing.Size(275, 32);
-            this.textBoxUsername.TabIndex = 2;
-            this.textBoxUsername.Text = "admin@test.com";
+            this.txbUserEmail.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.txbUserEmail.Location = new System.Drawing.Point(140, 65);
+            this.txbUserEmail.Name = "txbUserEmail";
+            this.txbUserEmail.Size = new System.Drawing.Size(275, 32);
+            this.txbUserEmail.TabIndex = 2;
+            this.txbUserEmail.Text = "admin@test.com";
             // 
-            // textBoxPassword
+            // txbUserPassword
             // 
-            this.textBoxPassword.Font = new System.Drawing.Font("Segoe UI", 11F);
-            this.textBoxPassword.Location = new System.Drawing.Point(140, 115);
-            this.textBoxPassword.Name = "textBoxPassword";
-            this.textBoxPassword.Size = new System.Drawing.Size(275, 32);
-            this.textBoxPassword.TabIndex = 4;
-            this.textBoxPassword.Text = "123456";
-            this.textBoxPassword.UseSystemPasswordChar = true;
-            this.textBoxPassword.TextChanged += new System.EventHandler(this.textBoxPassword_TextChanged);
+            this.txbUserPassword.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.txbUserPassword.Location = new System.Drawing.Point(140, 115);
+            this.txbUserPassword.Name = "txbUserPassword";
+            this.txbUserPassword.Size = new System.Drawing.Size(275, 32);
+            this.txbUserPassword.TabIndex = 4;
+            this.txbUserPassword.Text = "123456";
+            this.txbUserPassword.UseSystemPasswordChar = true;
+            this.txbUserPassword.TextChanged += new System.EventHandler(this.textBoxPassword_TextChanged);
             // 
             // btnLogin
             // 
@@ -125,9 +125,9 @@ namespace Lab_8
             this.panelMain.BackColor = System.Drawing.Color.WhiteSmoke;
             this.panelMain.Controls.Add(this.labelTitle);
             this.panelMain.Controls.Add(this.labelUsername);
-            this.panelMain.Controls.Add(this.textBoxUsername);
+            this.panelMain.Controls.Add(this.txbUserEmail);
             this.panelMain.Controls.Add(this.labelPassword);
-            this.panelMain.Controls.Add(this.textBoxPassword);
+            this.panelMain.Controls.Add(this.txbUserPassword);
             this.panelMain.Controls.Add(this.btnLogin);
             this.panelMain.Controls.Add(this.btnExit);
             this.panelMain.Dock = System.Windows.Forms.DockStyle.Fill;

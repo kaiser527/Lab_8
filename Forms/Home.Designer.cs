@@ -32,7 +32,7 @@
             this.historyPanel = new System.Windows.Forms.Panel();
             this.tootStripHome = new System.Windows.Forms.ToolStrip();
             this.toolStripAdminBtn = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSplitButton1 = new System.Windows.Forms.ToolStripSplitButton();
+            this.toolStripBtnDropdown = new System.Windows.Forms.ToolStripSplitButton();
             this.userProfileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.logoutToolStripItem = new System.Windows.Forms.ToolStripMenuItem();
             this.flpQuiz = new System.Windows.Forms.FlowLayoutPanel();
@@ -45,7 +45,7 @@
             this.historyPanel.BackColor = System.Drawing.Color.White;
             this.historyPanel.Location = new System.Drawing.Point(803, 37);
             this.historyPanel.Name = "historyPanel";
-            this.historyPanel.Size = new System.Drawing.Size(397, 745);
+            this.historyPanel.Size = new System.Drawing.Size(397, 710);
             this.historyPanel.TabIndex = 1;
             // 
             // tootStripHome
@@ -55,7 +55,7 @@
             this.tootStripHome.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.tootStripHome.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripAdminBtn,
-            this.toolStripSplitButton1});
+            this.toolStripBtnDropdown});
             this.tootStripHome.Location = new System.Drawing.Point(0, 0);
             this.tootStripHome.Name = "tootStripHome";
             this.tootStripHome.Size = new System.Drawing.Size(1212, 32);
@@ -73,28 +73,29 @@
             this.toolStripAdminBtn.Text = "Admin";
             this.toolStripAdminBtn.Click += new System.EventHandler(this.toolStripAdminBtn_Click);
             // 
-            // toolStripSplitButton1
+            // toolStripBtnDropdown
             // 
-            this.toolStripSplitButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripSplitButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripBtnDropdown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripBtnDropdown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.userProfileToolStripMenuItem,
             this.logoutToolStripItem});
-            this.toolStripSplitButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripSplitButton1.Image")));
-            this.toolStripSplitButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripSplitButton1.Name = "toolStripSplitButton1";
-            this.toolStripSplitButton1.Size = new System.Drawing.Size(81, 29);
-            this.toolStripSplitButton1.Text = "Profile";
+            this.toolStripBtnDropdown.Image = ((System.Drawing.Image)(resources.GetObject("toolStripBtnDropdown.Image")));
+            this.toolStripBtnDropdown.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripBtnDropdown.Name = "toolStripBtnDropdown";
+            this.toolStripBtnDropdown.Size = new System.Drawing.Size(81, 29);
+            this.toolStripBtnDropdown.Text = "Profile";
             // 
             // userProfileToolStripMenuItem
             // 
             this.userProfileToolStripMenuItem.Name = "userProfileToolStripMenuItem";
-            this.userProfileToolStripMenuItem.Size = new System.Drawing.Size(188, 30);
+            this.userProfileToolStripMenuItem.Size = new System.Drawing.Size(224, 30);
             this.userProfileToolStripMenuItem.Text = "User Profile";
+            this.userProfileToolStripMenuItem.Click += new System.EventHandler(this.userProfileToolStripMenuItem_Click);
             // 
             // logoutToolStripItem
             // 
             this.logoutToolStripItem.Name = "logoutToolStripItem";
-            this.logoutToolStripItem.Size = new System.Drawing.Size(188, 30);
+            this.logoutToolStripItem.Size = new System.Drawing.Size(224, 30);
             this.logoutToolStripItem.Text = "Logout";
             // 
             // flpQuiz
@@ -102,13 +103,13 @@
             this.flpQuiz.BackColor = System.Drawing.Color.White;
             this.flpQuiz.Location = new System.Drawing.Point(12, 37);
             this.flpQuiz.Name = "flpQuiz";
-            this.flpQuiz.Size = new System.Drawing.Size(785, 667);
+            this.flpQuiz.Size = new System.Drawing.Size(785, 632);
             this.flpQuiz.TabIndex = 3;
             // 
             // paginatePanel
             // 
             this.paginatePanel.BackColor = System.Drawing.Color.White;
-            this.paginatePanel.Location = new System.Drawing.Point(12, 710);
+            this.paginatePanel.Location = new System.Drawing.Point(12, 675);
             this.paginatePanel.Name = "paginatePanel";
             this.paginatePanel.Size = new System.Drawing.Size(785, 72);
             this.paginatePanel.TabIndex = 4;
@@ -117,7 +118,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1212, 794);
+            this.ClientSize = new System.Drawing.Size(1212, 759);
             this.Controls.Add(this.paginatePanel);
             this.Controls.Add(this.flpQuiz);
             this.Controls.Add(this.tootStripHome);
@@ -140,7 +141,7 @@
         private System.Windows.Forms.ToolStripButton toolStripAdminBtn;
         private System.Windows.Forms.FlowLayoutPanel flpQuiz;
         private System.Windows.Forms.Panel paginatePanel;
-        private System.Windows.Forms.ToolStripSplitButton toolStripSplitButton1;
+        public System.Windows.Forms.ToolStripSplitButton toolStripBtnDropdown;
         private System.Windows.Forms.ToolStripMenuItem userProfileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem logoutToolStripItem;
     }

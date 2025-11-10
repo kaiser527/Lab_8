@@ -30,7 +30,6 @@
         {
             this.panel1 = new System.Windows.Forms.Panel();
             this.quizNameLabel = new System.Windows.Forms.Label();
-            this.timeLabel = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.QuestionAnswerGroupbox = new System.Windows.Forms.GroupBox();
@@ -41,7 +40,6 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.timeLabel);
             this.panel1.Controls.Add(this.quizNameLabel);
             this.panel1.Location = new System.Drawing.Point(13, 13);
             this.panel1.Name = "panel1";
@@ -57,17 +55,6 @@
             this.quizNameLabel.Size = new System.Drawing.Size(370, 69);
             this.quizNameLabel.TabIndex = 0;
             this.quizNameLabel.Text = "English Test";
-            // 
-            // timeLabel
-            // 
-            this.timeLabel.AutoSize = true;
-            this.timeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.timeLabel.ForeColor = System.Drawing.Color.Red;
-            this.timeLabel.Location = new System.Drawing.Point(600, 35); // position next to quiz name
-            this.timeLabel.Name = "timeLabel";
-            this.timeLabel.Size = new System.Drawing.Size(200, 46);
-            this.timeLabel.TabIndex = 1;
-            this.timeLabel.Text = "01:00";
             // 
             // panel2
             // 
@@ -119,6 +106,7 @@
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
+
         }
 
         #endregion
@@ -126,7 +114,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Label quizNameLabel;
-        private System.Windows.Forms.Label timeLabel;
         private System.Windows.Forms.ListView listViewQuestion;
         private System.Windows.Forms.GroupBox QuestionAnswerGroupbox;
         private System.Windows.Forms.ProgressBar progressBar1;

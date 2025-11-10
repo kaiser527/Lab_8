@@ -8,7 +8,7 @@ namespace Lab_8
 {
     public partial class Login : Form
     {
-        private readonly bool _isPlaceholderUsernameApplied = false;
+        private readonly bool _isPlaceholderEmailApplied = false;
 
         private readonly bool _isPlaceholderPasswordApplied = false;
 
@@ -29,10 +29,10 @@ namespace Lab_8
         {
             InitializeComponent();
 
-            UIStyle.ApplyPlaceholder(textBoxUsername, "Account Username...", ref _isPlaceholderUsernameApplied);
+            UIStyle.ApplyPlaceholder(txbUserEmail, "User Email...", ref _isPlaceholderEmailApplied);
 
-            textBoxPassword.UseSystemPasswordChar = false;
-            UIStyle.ApplyPlaceholder(textBoxPassword, "Account Password...", ref _isPlaceholderPasswordApplied);
+            txbUserPassword.UseSystemPasswordChar = false;
+            UIStyle.ApplyPlaceholder(txbUserPassword, "User Password...", ref _isPlaceholderPasswordApplied);
         }
 
         #region Methods
@@ -40,11 +40,11 @@ namespace Lab_8
         {
             if (IsLoading) return; // Prevent clicking twice quickly
 
-            string username = textBoxUsername.Text.Trim();
-            string password = textBoxPassword.Text.Trim();
+            string username = txbUserEmail.Text.Trim();
+            string password = txbUserPassword.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password) ||
-                textBoxUsername.Text == "Account Username..." || textBoxPassword.Text == "Account Password...")
+                txbUserEmail.Text == "User Email..." || txbUserPassword.Text == "User Password...")
             {
                 MessageBox.Show("Missing information", "Alert");
                 return;
@@ -104,13 +104,13 @@ namespace Lab_8
 
         private void textBoxPassword_TextChanged(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(textBoxPassword.Text) || textBoxPassword.Text == "Account Password...")
+            if (string.IsNullOrEmpty(txbUserPassword.Text) || txbUserPassword.Text == "User Password...")
             {
-                textBoxPassword.UseSystemPasswordChar = false;
+                txbUserPassword.UseSystemPasswordChar = false;
             }
             else
             {
-                textBoxPassword.UseSystemPasswordChar = true;
+                txbUserPassword.UseSystemPasswordChar = true;
             }
         }
     }

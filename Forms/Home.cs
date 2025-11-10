@@ -201,7 +201,7 @@ namespace Lab_8.Forms
             // Difficulty label (smaller)
             Label lblDiff = new Label
             {
-                Text = $"Difficulty: {quiz.Difficulty}",
+                Text = quiz.Difficulty.ToUpper(),
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 AutoSize = false,
                 Width = 160,
@@ -332,6 +332,9 @@ namespace Lab_8.Forms
             var quizTask = LoadQuiz();
 
             await Task.WhenAll(quizTask);
+
+            var user = UserService.Instance.User;
+            toolStripBtnDropdown.Text = user.Name;
         }
 
         private void toolStripAdminBtn_Click(object sender, EventArgs e)
@@ -339,6 +342,12 @@ namespace Lab_8.Forms
             Admin admin = new Admin(this);
 
             admin.ShowDialog(); 
+        }
+
+        private void userProfileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            UserProfile userProfile = new UserProfile(this);
+            userProfile.ShowDialog();
         }
         #endregion
     }

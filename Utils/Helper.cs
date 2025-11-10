@@ -4,7 +4,7 @@ namespace Lab_8.Utils
 {
     internal class Helper
     {
-        public static byte[] UploadImage(OpenFileDialog openFileDialog, PictureBox pictureBox)
+        public static byte[] UploadImage(OpenFileDialog openFileDialog, PictureBox pictureBox = null)
         {
             openFileDialog.Title = "Select User Image";
             openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp;*.gif";
@@ -13,7 +13,8 @@ namespace Lab_8.Utils
             {
                 string filePath = openFileDialog.FileName;
 
-                pictureBox.Image = System.Drawing.Image.FromFile(filePath);
+                if(pictureBox != null)
+                    pictureBox.Image = System.Drawing.Image.FromFile(filePath);
 
                 return System.IO.File.ReadAllBytes(filePath);
             }

@@ -129,3 +129,4 @@ C:\Users\Admin\source\repos\Lab_8\bin\Debug\BCrypt.Net-Next.xml
 C:\Users\Admin\source\repos\Lab_8\obj\Debug\Lab_8.Login.resources
 C:\Users\Admin\source\repos\Lab_8\obj\Debug\Lab_8.Forms.Home.resources
 C:\Users\Admin\source\repos\Lab_8\obj\Debug\Lab_8.Forms.Admin.resources
+C:\Users\Admin\source\repos\Lab_8\obj\Debug\Lab_8.Forms.UserProfile.resources

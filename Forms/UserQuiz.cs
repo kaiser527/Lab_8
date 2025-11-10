@@ -22,10 +22,6 @@ namespace Lab_8
 
         private readonly Dictionary<int, Answer> _userSelectedAnswers = new Dictionary<int, Answer>();
 
-        private Timer _timer;
-        private TimeSpan _remainingTime;
-        private readonly int _quizDurationMinutes = 1;
-
         public UserQuiz(int quizId, int historyId, Home home)
         {
             InitializeComponent();
@@ -36,22 +32,6 @@ namespace Lab_8
         }
 
         #region Methods
-        private async Task SubmitQuiz()
-        {
-            var checkedAnswers = _userSelectedAnswers.Values.ToList();
-
-            await HistoryService.Instance.SubmitQuizHistory(new History
-            {
-                Id = _historyId,
-                QuizId = _quizId
-            }, checkedAnswers);
-
-            await _home.LoadQuiz();
-            await _home.ShowHistoryAsync(_quizId);
-
-            Close();
-        }
-
         private async Task LoadQuiz()
         {
             _quiz = await QuizService.Instance.GetQuizById(_quizId);
@@ -231,9 +211,20 @@ namespace Lab_8
             styleButton(btnFinish);
             btnFinish.Click += async (s, e) =>
             {
+                var checkedAnswers = _userSelectedAnswers.Values.ToList();
+
+                await HistoryService.Instance.SubmitQuizHistory(new History
+                {
+                    Id = _historyId,
+                    QuizId = _quizId
+                }, checkedAnswers);
+
+                await _home.LoadQuiz();
+                await _home.ShowHistoryAsync(_quizId);
+
                 MessageBox.Show("Quiz submitted successfully!");
 
-                await SubmitQuiz();
+                Close();
             };
             QuestionAnswerGroupbox.Controls.Add(btnFinish);
         }
@@ -256,34 +247,9 @@ namespace Lab_8
             UpdateProgressBar(_currentQuestionIndex);
         }
 
-        private async void Timer_Tick(object sender, EventArgs e)
-        {
-            _remainingTime = _remainingTime.Subtract(TimeSpan.FromSeconds(1));
-            timeLabel.Text = _remainingTime.ToString(@"mm\:ss");
-
-            if (_remainingTime <= TimeSpan.Zero)
-            {
-                _timer.Stop();
-                MessageBox.Show("Time is up! The quiz will be submitted automatically.");
-
-                await SubmitQuiz();
-            }
-        }
-
         private async void UserQuiz_Load(object sender, EventArgs e)
         {
             await LoadQuiz();
-
-            // Initialize countdown timer
-            _remainingTime = TimeSpan.FromMinutes(_quizDurationMinutes);
-            timeLabel.Text = _remainingTime.ToString(@"mm\:ss");
-
-            _timer = new Timer
-            {
-                Interval = 1000 // 1 second
-            };
-            _timer.Tick += Timer_Tick;
-            _timer.Start();
         }
         #endregion
     }

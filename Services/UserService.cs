@@ -1,4 +1,5 @@
-﻿using Lab_8.Models;
+﻿using Lab_8.DTO;
+using Lab_8.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -41,6 +42,48 @@ namespace Lab_8.Services
                 if (success) User = user;
 
                 return (success ? user : null, success);
+            }
+        }
+
+        public async Task<(bool, User)> UpdateUserProfile(UpdateUserProfile updateUserProfile)
+        {
+            using (var context = new QuizDBContext())
+            {
+                bool isClose = true;
+
+                User user = await context.Users.FirstOrDefaultAsync(a => a.Id == User.Id);
+
+                if (user == null)
+                {
+                    MessageBox.Show("User is not exists", "Update failed");
+                    isClose = false;
+                }
+
+                bool success = BCrypt.Net.BCrypt.Verify(updateUserProfile.Password, user.Password);
+
+                if (!success)
+                {
+                    MessageBox.Show("Password is incorrect", "Update failed");
+                    isClose = false;
+                }
+
+                if (updateUserProfile.ConfirmPassword != updateUserProfile.NewPassword)
+                {
+                    MessageBox.Show("Password and confirm password not match", "Update failed");
+                    isClose = false;
+                }
+
+                if (isClose)
+                {
+                    user.Email = updateUserProfile.Email;
+                    user.Name = updateUserProfile.Name;
+                    user.Password = BCrypt.Net.BCrypt.HashPassword(updateUserProfile.ConfirmPassword);
+                    user.Image = updateUserProfile.Image;
+
+                    await context.SaveChangesAsync();
+                }
+
+                return (isClose, user);
             }
         }
 
