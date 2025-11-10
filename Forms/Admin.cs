@@ -572,7 +572,7 @@ namespace Lab_8.Forms
                             imageToSave = (byte[])imageProp.GetValue(userObj);
                     }
 
-                    User updateUser = new User
+                    User updateToUser = new User
                     {
                         Id = selectedUserId,
                         Name = txbUserName.Text,
@@ -580,9 +580,15 @@ namespace Lab_8.Forms
                         Image = imageToSave,
                     };
 
-                    await UserService.Instance.UpdateUser(updateUser);
+                    var updatedUser = await UserService.Instance.UpdateUser(updateToUser);
 
                     await ReloadUser();
+
+                    if(UserService.Instance.User.Id == updatedUser.Id)
+                    {
+                        UserService.Instance.User = updatedUser;
+                        _home.toolStripBtnDropdown.Text = updatedUser.Name;
+                    }
                 break;
 
                 default:
