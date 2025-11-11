@@ -138,7 +138,7 @@ namespace Lab_8.Services
             }
         }
 
-        public async Task UpdateUser(User user)
+        public async Task<User> UpdateUser(User user)
         {
             using (var context = new QuizDBContext())
             {
@@ -147,7 +147,7 @@ namespace Lab_8.Services
                 if (existingUser == null)
                 {
                     MessageBox.Show("User not found", "Update failed");
-                    return;
+                    return null;
                 }
 
                 existingUser.Name = user.Name;
@@ -156,6 +156,8 @@ namespace Lab_8.Services
                     existingUser.Image = user.Image;
 
                 await context.SaveChangesAsync();
+
+                return existingUser;    
             }
         }
 
