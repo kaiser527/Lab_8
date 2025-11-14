@@ -173,6 +173,12 @@ namespace Lab_8.Services
                     return;
                 }
 
+                if(user.Id == User.Id)
+                {
+                    MessageBox.Show("Cannot delete yourself", "Delete failed");
+                    return;
+                }
+
                 context.Users.Remove(user);
                 await context.SaveChangesAsync();
             }

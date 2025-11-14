@@ -15,8 +15,6 @@ namespace Lab_8.Utils
             context.Database.EnsureCreated();
 
             // Stop if already seeded
-            if (context.Users.Any() || context.Quizzes.Any())
-                return;
 
             // Path to images folder
             string basePath = Path.Combine(Application.StartupPath, "Image");
@@ -42,8 +40,11 @@ namespace Lab_8.Utils
                 Image = File.ReadAllBytes(Path.Combine(userImgPath, "user.png"))
             };
 
-            context.Users.AddRange(admin, john);
-            context.SaveChanges();
+            if (!context.Users.Any())
+            {
+                context.Users.AddRange(admin, john);
+                context.SaveChanges();
+            }
 
             // ===== QUIZ =====
             var quiz = new Quiz
@@ -53,8 +54,11 @@ namespace Lab_8.Utils
                 Image = File.ReadAllBytes(Path.Combine(quizImgPath, "general.jpg"))
             };
 
-            context.Quizzes.Add(quiz);
-            context.SaveChanges();
+            if (!context.Quizzes.Any())
+            {
+                context.Quizzes.Add(quiz);
+                context.SaveChanges();
+            }
 
             // ===== QUESTIONS + ANSWERS =====
             var questions = new List<Question>
@@ -84,8 +88,11 @@ namespace Lab_8.Utils
                 }
             };
 
-            context.Questions.AddRange(questions);
-            context.SaveChanges();
+            if (!context.Questions.Any() && !context.Answers.Any())
+            {
+                context.Questions.AddRange(questions);
+                context.SaveChanges();
+            }
 
             // ===== HISTORY (John completes quiz) =====
             var history = new History
@@ -98,8 +105,11 @@ namespace Lab_8.Utils
                 TotalScore = 100,
             };
 
-            context.Histories.Add(history);
-            context.SaveChanges();
+            if (!context.Histories.Any())
+            {
+                context.Histories.Add(history);
+                context.SaveChanges();
+            }
 
             // ===== USER ANSWERS (John selected correct answers) =====
             var allAnswers = context.Answers.ToList();
@@ -120,8 +130,11 @@ namespace Lab_8.Utils
                 }
             };
 
-            context.UserAnswers.AddRange(userAnswers);
-            context.SaveChanges();
+            if (!context.UserAnswers.Any())
+            {
+                context.UserAnswers.AddRange(userAnswers);
+                context.SaveChanges();
+            }
         }
     }
 }

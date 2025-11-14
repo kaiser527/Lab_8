@@ -58,10 +58,18 @@ namespace Lab_8
 
                 if (user != null && success)
                 {
+                    if (chkRememberMe.Checked)
+                    {
+                        LocalStorage.SaveUser(user);
+                    }
+                    else
+                    {
+                        LocalStorage.ClearUser();
+                    }
+
                     Home home = new Home();
                     Hide();
                     home.ShowDialog();
-                    Show();
                 }
                 else
                 {

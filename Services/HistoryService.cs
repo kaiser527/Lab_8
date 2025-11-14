@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WinFormApp.DTO;
 
 namespace Lab_8.Services
 {
@@ -23,13 +24,44 @@ namespace Lab_8.Services
 
         private HistoryService() { }
 
-        public async Task<IEnumerable<History>> GetListHistoryByQuizIdAndUserId(int quizId, int userId)
+        public async Task<PaginatedResult<History>> GetListHistoryByQuizIdAndUserId(
+            int quizId,
+            int userId,
+            int pageSize = 100,
+            int pageNumber = 1,
+            DateTime? timeStart = null,
+            DateTime? timeFinish = null
+        )
         {
             using (var context = new QuizDBContext())
             {
-                return await context.Histories
-                    .Where(h => h.QuizId == quizId && h.UserId == userId)
+                var query = context.Histories.Where(h => h.QuizId == quizId && h.UserId == userId);
+
+                if (timeStart.HasValue)
+                {
+                    query = query.Where(h => h.TimeFinish >= timeStart.Value);
+                }
+
+                if (timeFinish.HasValue)
+                {
+                    query = query.Where(h => h.TimeStart <= timeFinish.Value);
+                }
+
+                int totalCount = await query.CountAsync(); 
+                int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+                var items = await query
+                    .OrderByDescending(h => h.IsFinish ? h.TimeFinish : h.TimeStart)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
                     .ToListAsync();
+
+                return new PaginatedResult<History>
+                {
+                    Items = items,
+                    TotalCount = totalCount,
+                    TotalPages = totalPages
+                };
             }
         }
 

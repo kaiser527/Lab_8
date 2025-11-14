@@ -11,9 +11,15 @@ namespace Lab_8.Forms
 {
     public partial class Home : Form
     {
-        private int _currentPage = 1;
-        private readonly int _pageSize = 6;
-        private int _totalPages = 1;
+        private int _currentPageQuiz = 1;
+        private readonly int _pageSizeQuiz = 6;
+        private int _totalPagesQuiz = 1;
+
+        private int _currentPageHistory = 1;
+        private readonly int _pageSizeHistory = 5;
+        private int _totalPagesHistory = 1;
+        private DateTime? _timeStart = null;
+        private DateTime? _timeFinish = null;
 
         public Home()
         {
@@ -27,10 +33,10 @@ namespace Lab_8.Forms
         {
             flpQuiz.Controls.Clear();
 
-            var result = await QuizService.Instance.GetListQuiz(_pageSize, _currentPage, null);
+            var result = await QuizService.Instance.GetListQuiz(_pageSizeQuiz, _currentPageQuiz, null);
             if (result == null || !result.Items.Any()) return;
 
-            _totalPages = result.TotalPages;
+            _totalPagesQuiz = result.TotalPages;
 
             foreach (var quiz in result.Items)
             {
@@ -39,12 +45,12 @@ namespace Lab_8.Forms
             }
 
             LayoutForm.RenderPagination(
-                paginatePanel,
-                _currentPage,
-                _totalPages,
+                paginatePanelQuiz,
+                _currentPageQuiz,
+                _totalPagesQuiz,
                 async (newPage) =>
                 {
-                    _currentPage = newPage;
+                    _currentPageQuiz = newPage;
                     await LoadQuiz();
                 }
             );
@@ -52,81 +58,227 @@ namespace Lab_8.Forms
 
         private void StylePanels()
         {
-            UIStyle.RoundPanel(paginatePanel, 15);
+            UIStyle.RoundPanel(paginatePanelQuiz, 15);
             UIStyle.RoundPanel(historyPanel, 15);
             UIStyle.RoundPanel(flpQuiz, 15);
+            UIStyle.RoundPanel(paginatePanelHistory, 15);
         }
 
-        public async Task ShowHistoryAsync(int quizId)
+        public async Task<int> ShowHistoryAsync(int quizId)
         {
             historyPanel.Controls.Clear();
 
             var user = UserService.Instance.User;
-            var histories = await HistoryService.Instance.GetListHistoryByQuizIdAndUserId(quizId, user.Id);
 
-            // create a scrollable container for history items
-            FlowLayoutPanel flow = new FlowLayoutPanel
+            // Title
+            Label lblTitle = new Label
+            {
+                Text = "Quiz History",
+                Dock = DockStyle.Top,
+                Height = 40,
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.FromArgb(0, 120, 215)
+            };
+            historyPanel.Controls.Add(lblTitle);
+
+            // Base container (FlowLayoutPanel)
+            var flow = new FlowLayoutPanel
             {
                 Dock = DockStyle.Fill,
                 AutoScroll = true,
                 FlowDirection = FlowDirection.TopDown,
                 WrapContents = false,
-                Padding = new Padding(10)
+                Padding = new Padding(15, 52, 15, 15), // keep your padding
+                BackColor = Color.WhiteSmoke
             };
             historyPanel.Controls.Add(flow);
 
-            if (histories == null || !histories.Any())
+            // --- Create DateTimePickers panel (always visible) ---
+            Panel datePickerPanel = new Panel
             {
-                Label lblNoHistory = new Label
+                Width = flow.ClientSize.Width - 30,
+                Height = 20,
+                Margin = new Padding(0, 0, 0, 4) // keep your margin
+            };
+
+            DateTimePicker dtpStart = new DateTimePicker
+            {
+                Format = DateTimePickerFormat.Custom,
+                CustomFormat = "yyyy-MM-dd HH:mm",
+                Width = (datePickerPanel.Width / 2) - 5,
+                Location = new Point(0, 0)
+            };
+            dtpStart.ValueChanged += async (s, e) =>
+            {
+                _timeStart = dtpStart.Value;
+                _currentPageHistory = 1;
+                await RenderHistoryPagination(quizId);
+            };
+
+            DateTimePicker dtpFinish = new DateTimePicker
+            {
+                Format = DateTimePickerFormat.Custom,
+                CustomFormat = "yyyy-MM-dd HH:mm",
+                Width = (datePickerPanel.Width / 2) - 5,
+                Location = new Point(dtpStart.Right + 10, 0)
+            };
+            dtpFinish.ValueChanged += async (s, e) =>
+            {
+                _timeFinish = dtpFinish.Value;
+                _currentPageHistory = 1;
+                await RenderHistoryPagination(quizId);
+            };
+
+            datePickerPanel.Controls.Add(dtpStart);
+            datePickerPanel.Controls.Add(dtpFinish);
+            flow.Controls.Add(datePickerPanel);
+
+            Panel resetPanel = new Panel
+            {
+                Width = datePickerPanel.Width,
+                Height = 30,
+                Margin = new Padding(0, 0, 0, 0)
+            };
+
+            Button btnReset = new Button
+            {
+                Text = "Reset Filter",
+                Width = datePickerPanel.Width / 3,
+                Height = 24,
+                BackColor = Color.LightGray,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 8, FontStyle.Regular)
+            };
+            btnReset.FlatAppearance.BorderSize = 0;
+
+            // Center the button in the panel
+            btnReset.Left = (resetPanel.Width - btnReset.Width) / 2;
+            btnReset.Top = (resetPanel.Height - btnReset.Height) / 2;
+
+            btnReset.Click += async (s, e) =>
+            {
+                dtpStart.Value = DateTime.Now;
+                dtpFinish.Value = DateTime.Now;
+                _timeStart = null;
+                _timeFinish = null;
+                _currentPageHistory = 1;
+                await RenderHistoryPagination(quizId);
+            };
+
+            resetPanel.Controls.Add(btnReset);
+            flow.Controls.Add(resetPanel);
+
+            // --- Fetch filtered history ---
+            var result = await HistoryService.Instance.GetListHistoryByQuizIdAndUserId(
+                quizId,
+                user.Id,
+                _pageSizeHistory,
+                _currentPageHistory,
+                _timeStart,
+                _timeFinish
+            );
+
+            // --- Empty state ---
+            if (result.Items == null || !result.Items.Any())
+            {
+                Panel emptyPanel = new Panel
                 {
-                    Text = "No history found for this quiz.",
-                    Dock = DockStyle.Top,
-                    Height = 40,
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    Font = new Font("Segoe UI", 10, FontStyle.Italic),
-                    ForeColor = Color.Gray
+                    Dock = DockStyle.Fill,
+                    BackColor = Color.WhiteSmoke
                 };
-                flow.Controls.Add(lblNoHistory);
-                return;
+
+                int topMargin = 170; // keep your topMargin
+
+                Label lblIcon = new Label
+                {
+                    Text = "📭",
+                    Font = new Font("Segoe UI Emoji", 40),
+                    Height = 100,
+                    Width = historyPanel.ClientSize.Width,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Top = topMargin
+                };
+                emptyPanel.Controls.Add(lblIcon);
+
+                Label lblEmpty = new Label
+                {
+                    Text = "No quiz history yet.\nTry taking a quiz to see it here!",
+                    Font = new Font("Segoe UI", 11, FontStyle.Italic),
+                    ForeColor = Color.Gray,
+                    Width = historyPanel.ClientSize.Width,
+                    Height = historyPanel.ClientSize.Height - lblIcon.Bottom - 20,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Top = lblIcon.Bottom - 97
+                };
+                emptyPanel.Controls.Add(lblEmpty);
+
+                flow.Controls.Add(emptyPanel);
+                return 0;
             }
 
-            foreach (var h in histories.OrderByDescending(h => h.TimeFinish))
+            // --- Render history items ---
+            foreach (var h in result.Items)
             {
                 var item = new Panel
                 {
-                    Width = flow.Width - 26,
-                    Height = 65,
-                    Margin = new Padding(3),
-                    BackColor = Color.WhiteSmoke,
-                    BorderStyle = BorderStyle.FixedSingle
+                    Width = flow.ClientSize.Width - 40,
+                    Height = 70,
+                    Margin = new Padding(5),
+                    BackColor = Color.White,
+                    Padding = new Padding(15),
+                    BorderStyle = BorderStyle.None,
+                    Cursor = Cursors.Hand
                 };
 
+                // Optional: rounded corners + shadow
+                item.Paint += (s, e) =>
+                {
+                    var g = e.Graphics;
+                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+                    using (var shadow = new SolidBrush(Color.FromArgb(30, 0, 0, 0)))
+                        g.FillRectangle(shadow, 2, 2, item.Width - 2, item.Height - 2);
+
+                    using (var bg = new SolidBrush(Color.White))
+                    using (var borderPen = new Pen(Color.LightGray))
+                    {
+                        var rect = new Rectangle(0, 0, item.Width - 4, item.Height - 4);
+                        g.FillRoundedRectangle(bg, rect, 8);
+                        g.DrawRoundedRectangle(borderPen, rect, 8);
+                    }
+                };
+
+                // Labels
                 Label lblDate = new Label
                 {
-                    Text = $"📅 Date: {(h.IsFinish ? h.TimeFinish.ToString("yyyy-MM-dd HH:mm") : h.TimeStart.ToString("yyyy-MM-dd HH:mm"))}",
-                    Left = 10,
-                    Top = 13,
+                    Text = $"📅 {(h.IsFinish ? h.TimeFinish.ToString("yyyy-MM-dd HH:mm") : h.TimeStart.ToString("yyyy-MM-dd HH:mm"))}",
                     AutoSize = true,
-                    Font = new Font("Segoe UI", 9, FontStyle.Regular)
+                    Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                    ForeColor = Color.DimGray,
+                    Left = 10,
+                    Top = 10
                 };
 
                 Label lblScore = new Label
                 {
                     Text = $"⭐ Score: {h.TotalScore}",
-                    Left = 10,
-                    Top = 36,
                     AutoSize = true,
-                    Font = new Font("Segoe UI", 9, FontStyle.Bold)
+                    Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(0, 120, 215),
+                    Left = 10,
+                    Top = 35
                 };
 
                 Label lblStatus = new Label
                 {
                     Text = h.IsFinish ? "✅ Finished" : "⏳ In Progress",
                     AutoSize = true,
-                    Left =  item.Width - ( h.IsFinish ? 78 : 91 ),
-                    Top = 24,
                     Font = new Font("Segoe UI", 9, FontStyle.Italic),
-                    ForeColor = h.IsFinish ? Color.FromArgb(0, 200, 83) : Color.FromArgb(255, 193, 7)
+                    ForeColor = h.IsFinish ? Color.FromArgb(0, 200, 83) : Color.FromArgb(255, 193, 7),
+                    Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                    Left = item.Width - (h.IsFinish ? 80 : 94),
+                    Top = 25
                 };
 
                 item.Controls.Add(lblDate);
@@ -135,6 +287,8 @@ namespace Lab_8.Forms
 
                 flow.Controls.Add(item);
             }
+
+            return result.TotalPages;
         }
 
         private async Task<Control> CreateQuizCard(Quiz quiz)
@@ -214,10 +368,13 @@ namespace Lab_8.Forms
 
             // Check if user has done this quiz before
             var user = UserService.Instance.User;
-            var histories = await HistoryService.Instance.GetListHistoryByQuizIdAndUserId(quiz.Id, user.Id);
-            var latestHistory = histories?
-                .OrderByDescending(h => h.IsFinish ? h.TimeFinish : h.TimeStart)
-                .FirstOrDefault();
+            var histories = (await HistoryService.Instance.GetListHistoryByQuizIdAndUserId(
+                quiz.Id, 
+                user.Id, 
+                1000, 
+                1
+            )).Items;
+            var latestHistory = histories?.FirstOrDefault();
 
             string buttonText;
             Color buttonColor;
@@ -257,10 +414,13 @@ namespace Lab_8.Forms
 
             btnEnter.Click += async (s, e) =>
             {
-                histories = await HistoryService.Instance.GetListHistoryByQuizIdAndUserId(quiz.Id, user.Id);
-                latestHistory = histories?
-                   .OrderByDescending(h => h.IsFinish ? h.TimeFinish : h.TimeStart)
-                   .FirstOrDefault();
+                histories = (await HistoryService.Instance.GetListHistoryByQuizIdAndUserId(
+                    quiz.Id,
+                    user.Id,
+                    1000,
+                    1
+                )).Items;
+                latestHistory = histories?.FirstOrDefault();
 
                 History historyToUse = null;
 
@@ -291,7 +451,7 @@ namespace Lab_8.Forms
                 UserQuiz quizForm = new UserQuiz(quiz.Id, historyToUse.Id, this);
                 quizForm.ShowDialog();
 
-                _ = ShowHistoryAsync(quiz.Id);
+                await HandleClickQuiz(quiz.Id);
             };
 
             // Add all controls
@@ -317,12 +477,34 @@ namespace Lab_8.Forms
             SetHoverEffect(lblDiff);
             SetHoverEffect(btnEnter);
 
-            pic.Click += async (s, e) => await ShowHistoryAsync(quiz.Id);
-            lblName.Click += async (s, e) => await ShowHistoryAsync(quiz.Id);
-            lblDiff.Click += async (s, e) => await ShowHistoryAsync(quiz.Id);
-            card.Click += async (s, e) => await ShowHistoryAsync(quiz.Id);
+            pic.Click += async (s, e) => await HandleClickQuiz(quiz.Id);
+            lblName.Click += async (s, e) => await HandleClickQuiz(quiz.Id);
+            lblDiff.Click += async (s, e) => await HandleClickQuiz(quiz.Id);
+            card.Click += async (s, e) => await HandleClickQuiz(quiz.Id);
 
             return card;
+        }
+
+        private async Task HandleClickQuiz(int quizId)
+        {
+            _currentPageHistory = 1; 
+            await RenderHistoryPagination(quizId);
+        }
+
+        private async Task RenderHistoryPagination(int quizId)
+        {
+            _totalPagesHistory = await ShowHistoryAsync(quizId);
+
+            LayoutForm.RenderPagination(
+                paginatePanelHistory,
+                _currentPageHistory,
+                _totalPagesHistory,
+                async (newPage) =>
+                {
+                    _currentPageHistory = newPage; 
+                    await RenderHistoryPagination(quizId);
+                }
+            );
         }
         #endregion
 
@@ -348,6 +530,17 @@ namespace Lab_8.Forms
         {
             UserProfile userProfile = new UserProfile(this);
             userProfile.ShowDialog();
+        }
+
+        private void logoutToolStripItem_Click(object sender, EventArgs e)
+        {
+            UserService.Instance.User = null;
+            LocalStorage.ClearUser();
+
+            Hide();
+            var login = new Login();
+            login.ShowDialog();
+            Close();
         }
         #endregion
     }

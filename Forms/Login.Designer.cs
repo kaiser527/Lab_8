@@ -14,6 +14,7 @@ namespace Lab_8
         private TextBox txbUserPassword;
         private Button btnLogin;
         private Button btnExit;
+        private CheckBox chkRememberMe;
         private Panel panelMain;
 
         protected override void Dispose(bool disposing)
@@ -34,6 +35,7 @@ namespace Lab_8
             this.btnLogin = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
             this.panelMain = new System.Windows.Forms.Panel();
+            this.chkRememberMe = new System.Windows.Forms.CheckBox();
             this.panelMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -96,7 +98,7 @@ namespace Lab_8
             this.btnLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLogin.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnLogin.ForeColor = System.Drawing.Color.White;
-            this.btnLogin.Location = new System.Drawing.Point(141, 165);
+            this.btnLogin.Location = new System.Drawing.Point(141, 186);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(100, 35);
             this.btnLogin.TabIndex = 5;
@@ -112,7 +114,7 @@ namespace Lab_8
             this.btnExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnExit.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnExit.ForeColor = System.Drawing.Color.White;
-            this.btnExit.Location = new System.Drawing.Point(313, 165);
+            this.btnExit.Location = new System.Drawing.Point(313, 186);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(100, 35);
             this.btnExit.TabIndex = 6;
@@ -130,18 +132,30 @@ namespace Lab_8
             this.panelMain.Controls.Add(this.txbUserPassword);
             this.panelMain.Controls.Add(this.btnLogin);
             this.panelMain.Controls.Add(this.btnExit);
+            this.panelMain.Controls.Add(this.chkRememberMe);
             this.panelMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelMain.Location = new System.Drawing.Point(0, 0);
             this.panelMain.Name = "panelMain";
             this.panelMain.Padding = new System.Windows.Forms.Padding(20);
-            this.panelMain.Size = new System.Drawing.Size(460, 223);
+            this.panelMain.Size = new System.Drawing.Size(460, 243);
             this.panelMain.TabIndex = 0;
+            // 
+            // chkRememberMe
+            // 
+            this.chkRememberMe.AutoSize = true;
+            this.chkRememberMe.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.chkRememberMe.Location = new System.Drawing.Point(142, 153);
+            this.chkRememberMe.Name = "chkRememberMe";
+            this.chkRememberMe.Size = new System.Drawing.Size(144, 27);
+            this.chkRememberMe.TabIndex = 5;
+            this.chkRememberMe.Text = "Remember Me";
+            this.chkRememberMe.UseVisualStyleBackColor = true;
             // 
             // Login
             // 
             this.AcceptButton = this.btnLogin;
             this.CancelButton = this.btnExit;
-            this.ClientSize = new System.Drawing.Size(460, 223);
+            this.ClientSize = new System.Drawing.Size(460, 243);
             this.Controls.Add(this.panelMain);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;

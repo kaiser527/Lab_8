@@ -36,7 +36,8 @@
             this.userProfileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.logoutToolStripItem = new System.Windows.Forms.ToolStripMenuItem();
             this.flpQuiz = new System.Windows.Forms.FlowLayoutPanel();
-            this.paginatePanel = new System.Windows.Forms.Panel();
+            this.paginatePanelQuiz = new System.Windows.Forms.Panel();
+            this.paginatePanelHistory = new System.Windows.Forms.Panel();
             this.tootStripHome.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -45,7 +46,7 @@
             this.historyPanel.BackColor = System.Drawing.Color.White;
             this.historyPanel.Location = new System.Drawing.Point(803, 37);
             this.historyPanel.Name = "historyPanel";
-            this.historyPanel.Size = new System.Drawing.Size(397, 710);
+            this.historyPanel.Size = new System.Drawing.Size(397, 632);
             this.historyPanel.TabIndex = 1;
             // 
             // tootStripHome
@@ -97,6 +98,7 @@
             this.logoutToolStripItem.Name = "logoutToolStripItem";
             this.logoutToolStripItem.Size = new System.Drawing.Size(224, 30);
             this.logoutToolStripItem.Text = "Logout";
+            this.logoutToolStripItem.Click += new System.EventHandler(this.logoutToolStripItem_Click);
             // 
             // flpQuiz
             // 
@@ -106,20 +108,29 @@
             this.flpQuiz.Size = new System.Drawing.Size(785, 632);
             this.flpQuiz.TabIndex = 3;
             // 
-            // paginatePanel
+            // paginatePanelQuiz
             // 
-            this.paginatePanel.BackColor = System.Drawing.Color.White;
-            this.paginatePanel.Location = new System.Drawing.Point(12, 675);
-            this.paginatePanel.Name = "paginatePanel";
-            this.paginatePanel.Size = new System.Drawing.Size(785, 72);
-            this.paginatePanel.TabIndex = 4;
+            this.paginatePanelQuiz.BackColor = System.Drawing.Color.White;
+            this.paginatePanelQuiz.Location = new System.Drawing.Point(12, 675);
+            this.paginatePanelQuiz.Name = "paginatePanelQuiz";
+            this.paginatePanelQuiz.Size = new System.Drawing.Size(785, 72);
+            this.paginatePanelQuiz.TabIndex = 4;
+            // 
+            // paginatePanelHistory
+            // 
+            this.paginatePanelHistory.BackColor = System.Drawing.Color.White;
+            this.paginatePanelHistory.Location = new System.Drawing.Point(803, 675);
+            this.paginatePanelHistory.Name = "paginatePanelHistory";
+            this.paginatePanelHistory.Size = new System.Drawing.Size(397, 72);
+            this.paginatePanelHistory.TabIndex = 5;
             // 
             // Home
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1212, 759);
-            this.Controls.Add(this.paginatePanel);
+            this.Controls.Add(this.paginatePanelHistory);
+            this.Controls.Add(this.paginatePanelQuiz);
             this.Controls.Add(this.flpQuiz);
             this.Controls.Add(this.tootStripHome);
             this.Controls.Add(this.historyPanel);
@@ -140,9 +151,10 @@
         private System.Windows.Forms.ToolStrip tootStripHome;
         private System.Windows.Forms.ToolStripButton toolStripAdminBtn;
         private System.Windows.Forms.FlowLayoutPanel flpQuiz;
-        private System.Windows.Forms.Panel paginatePanel;
+        private System.Windows.Forms.Panel paginatePanelQuiz;
         public System.Windows.Forms.ToolStripSplitButton toolStripBtnDropdown;
         private System.Windows.Forms.ToolStripMenuItem userProfileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem logoutToolStripItem;
+        private System.Windows.Forms.Panel paginatePanelHistory;
     }
 }

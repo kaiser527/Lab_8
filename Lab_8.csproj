@@ -267,6 +267,7 @@
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Utils\Helper.cs" />
     <Compile Include="Utils\LayoutForm.cs" />
+    <Compile Include="Utils\LocalStorage.cs" />
     <Compile Include="Utils\UIStyle.cs" />
     <EmbeddedResource Include="Forms\Admin.resx">
       <DependentUpon>Admin.cs</DependentUpon>

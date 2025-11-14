@@ -1,4 +1,6 @@
-﻿using Lab_8.Models;
+﻿using Lab_8.Forms;
+using Lab_8.Models;
+using Lab_8.Services;
 using Lab_8.Utils;
 using System;
 using System.Windows.Forms;
@@ -20,7 +22,17 @@ namespace Lab_8
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Login());
+
+            var savedUser = LocalStorage.LoadUser();
+            if (savedUser != null)
+            {
+                UserService.Instance.User = savedUser;
+                Application.Run(new Home());
+            }
+            else
+            {
+                Application.Run(new Login());
+            }
         }
     }
 }
