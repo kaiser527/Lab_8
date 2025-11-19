@@ -23,6 +23,12 @@ namespace Lab_8.Models
         [Column(TypeName = "VARBINARY(MAX)")]
         public byte[] Image { get; set; }
 
+        [Required]
+        public int RoleId { get; set; }
+
+        [ForeignKey("RoleId")]
+        public Role Role { get; set; }
+
         public ICollection<History> Histories { get; set; } = new List<History>();
 
         public ICollection<UserAnswer> UserAnswers { get; set; } = new List<UserAnswer>();

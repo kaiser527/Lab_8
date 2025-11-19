@@ -1,11 +1,16 @@
 ﻿using Lab_8.Models;
 using Lab_8.Services;
 using Lab_8.Utils;
+using NAudio.Wave;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WinFormApp.DTO;
+using WinFormApp.Forms;
 
 namespace Lab_8.Forms
 {
@@ -17,10 +22,12 @@ namespace Lab_8.Forms
         //Data binding
         private readonly BindingSource userlist = new BindingSource();
         private readonly BindingSource quizlist = new BindingSource();
+        private readonly BindingSource rolelist = new BindingSource();
 
         //Placeholder
         private readonly bool _isPlaceholderUserApplied = false;
         private readonly bool _isPlaceholderQuizApplied = false;
+        private readonly bool _isPlaceholderRoleApplied = false;
 
         //Paginate
         private readonly int _pageSize = 10;
@@ -30,6 +37,9 @@ namespace Lab_8.Forms
         //Quiz
         private int _currentPageQuiz = 1;
         private int _totalPagesQuiz = 1;
+        //Role
+        private int _currentPageRole = 1;
+        private int _totalPagesRole = 1;
 
         //User property
         private string userAction = null;
@@ -45,24 +55,389 @@ namespace Lab_8.Forms
         private byte[] selectedQuizImageBytes = null;
         private int quizId = 0;
 
+        //Role property
+        private List<Role> _roles;
+        private Role _selectedRole;
+        private string roleAction = null;
+
         public Admin(Home home  )
         {
             InitializeComponent();
             StylePanels();
+            ApplyPermissions();
 
             //Placeholder
             UIStyle.ApplyPlaceholder(txbSearchUser, "Search user", ref _isPlaceholderUserApplied);
             UIStyle.ApplyPlaceholder(txbSearchQuiz, "Search quiz", ref _isPlaceholderQuizApplied);
+            UIStyle.ApplyPlaceholder(txbSearchRole, "Search role", ref _isPlaceholderRoleApplied);
 
             Load += LoadData;
             _home = home;
         }
 
+        #region Methods
         private void LoadQuizDifficulty()
         {
             cbQuizDifficulty.DataSource = new string[] { "EASY", "MEDIUM", "HARD" };
         }
-        #region Methods
+
+        private void ApplyPermissions()
+        {
+            var role = UserService.Instance.User.Role;
+
+            if (role == null || !role.IsActive)
+            {
+                Alert.ShowAlert(
+                    "Your role is inactive. You do not have permission to access this area.",
+                    Alert.AlertType.Error
+                );
+
+                tcAdmin.TabPages.Clear();
+
+                return;
+            }
+
+            var permissionNames = role.RolePermissions
+                .Select(rp => rp.Permission.Name)
+                .ToList();
+
+            var permissionActions = new Dictionary<string, Action>
+            {
+                // Question
+                { "Upsert Question Answer", () => tcAdmin.TabPages.Remove(tpQuestionAnswer) },
+
+                // User
+                { "View User", () => tcAdmin.TabPages.Remove(tpUser) },
+                { "Create User", () => btnAddUser.Enabled = false },
+                { "Delete User", () => btnDeleteUser.Enabled = false },
+                { "Update User", () => btnEditUser.Enabled = false },
+
+                // Quiz
+                { "View Quiz", () => tcAdmin.TabPages.Remove(tpQuiz) },
+                { "Create Quiz", () => btnAddQuiz.Enabled = false },
+                { "Delete Quiz", () => btnDeleteQuiz.Enabled = false },
+                { "Update Quiz", () => btnEditQuiz.Enabled = false },
+
+                //Role
+                { "View Role", () => tcAdmin.TabPages.Remove(tpRole) },
+                { "Create Role", () => btnAddRole.Enabled = false },
+                { "Delete Role", () => btnDeleteRole.Enabled = false },
+                { "Update Role", () => btnEditQuiz.Enabled = false },
+
+                //Permission
+                { "View Permission", () => tcAdmin.TabPages.Remove(tpPermission) },
+            };
+
+            foreach (var kvp in permissionActions)
+            {
+                if (!permissionNames.Contains(kvp.Key))
+                {
+                    kvp.Value.Invoke();
+                }
+            }
+        }
+
+        public async Task LoadGroupPermission()
+        {
+            var result = await PermissionService.Instance.GetListPermission();
+
+            var groupedPermissions = result.Items
+                .GroupBy(p => p.Module)
+                .Select(g => new
+                {
+                    Module = g.Key,
+                    Permissions = g.ToList()
+                })
+                .ToList();
+
+            flpRole.Controls.Clear();
+            flpRole.AutoScroll = true;
+
+            // ✅ Add padding around modules
+            flpRole.Padding = new Padding(13);
+
+            // ✅ 2 columns compact layout
+            int columns = 2;
+            int spacing = 8;
+
+            // ✅ Width after padding applied
+            int parentInnerWidth = flpRole.ClientSize.Width - flpRole.Padding.Horizontal;
+            int moduleWidth = Math.Max(140, (parentInnerWidth - (columns - 1) * spacing) / columns);
+
+
+            void UpdateModuleHeight(Panel modulePanel, Panel headerPanel, Panel permissionPanel)
+            {
+                modulePanel.Height = permissionPanel.Visible
+                    ? headerPanel.Height + permissionPanel.Height + 8
+                    : headerPanel.Height + 12;
+            }
+
+            void Reflow()
+            {
+                int x = flpRole.Padding.Left;
+                int y = flpRole.Padding.Top;
+                int col = 0;
+                int rowMax = 0;
+
+                foreach (Control ctl in flpRole.Controls)
+                {
+                    if (ctl is Panel panel)
+                    {
+                        panel.Location = new Point(x, y);
+                        panel.Width = moduleWidth;
+
+                        rowMax = Math.Max(rowMax, panel.Height);
+                        col++;
+
+                        if (col >= columns)
+                        {
+                            col = 0;
+                            x = flpRole.Padding.Left;
+                            y += rowMax + spacing;
+                            rowMax = 0;
+                        }
+                        else x += moduleWidth + spacing;
+                    }
+                }
+            }
+
+            foreach (var group in groupedPermissions)
+            {
+                var modulePanel = new Panel
+                {
+                    Width = moduleWidth,
+                    BorderStyle = BorderStyle.FixedSingle,
+                    Padding = new Padding(2),
+                    AutoSize = false
+                };
+
+                // Header
+                var headerPanel = new Panel
+                {
+                    Height = 28,
+                    Dock = DockStyle.Top
+                };
+
+                var btnToggle = new Button
+                {
+                    Text = "▶",
+                    Width = 23,
+                    Height = 23,
+                    FlatStyle = FlatStyle.Flat
+                };
+                btnToggle.FlatAppearance.BorderSize = 0;
+                btnToggle.Location = new Point(2, (headerPanel.Height - btnToggle.Height) / 2 + 1);
+
+                var moduleCheckBox = new CheckBox
+                {
+                    Text = group.Module,
+                    AutoSize = true,
+                    Font = new Font("Segoe UI", 11f, FontStyle.Bold),
+                    Location = new Point(btnToggle.Right + 6, (headerPanel.Height - 20) / 2 + 1)
+                };
+
+                headerPanel.Controls.Add(btnToggle);
+                headerPanel.Controls.Add(moduleCheckBox);
+                modulePanel.Controls.Add(headerPanel);
+
+                // Permissions panel
+                var permissionPanel = new Panel
+                {
+                    Visible = false,
+                    AutoSize = true,
+                    Location = new Point(18, headerPanel.Bottom + 1)
+                };
+
+                List<EventHandler> permHandlers = new List<EventHandler>();
+                int yOff = 0;
+
+                foreach (var perm in group.Permissions)
+                {
+                    var cb = new CheckBox
+                    {
+                        Text = perm.Name,
+                        AutoSize = false,
+                        Tag = perm,
+                        Font = new Font("Segoe UI", 9.3f),
+                        Location = new Point(0, yOff),
+                        Width = moduleWidth - 40   // << FIX HERE
+                    };
+
+                    // Adjust height after measuring wrapped text
+                    cb.Height = TextRenderer.MeasureText(cb.Text, cb.Font,
+                        new Size(cb.Width, int.MaxValue),
+                        TextFormatFlags.WordBreak).Height + 4;
+
+                    yOff += cb.Height + 4;
+
+                    EventHandler eh = (s, e) =>
+                    {
+                        bool allChecked = permissionPanel.Controls.OfType<CheckBox>().All(c => c.Checked);
+                        moduleCheckBox.CheckedChanged -= ModuleCheckHandler;
+                        moduleCheckBox.Checked = allChecked;
+                        moduleCheckBox.CheckedChanged += ModuleCheckHandler;
+                    };
+
+                    cb.CheckedChanged += eh;
+                    permHandlers.Add(eh);
+                    permissionPanel.Controls.Add(cb);
+                }
+
+                void ModuleCheckHandler(object s, EventArgs e)
+                {
+                    int i = 0;
+                    foreach (CheckBox cb in permissionPanel.Controls.OfType<CheckBox>())
+                    {
+                        cb.CheckedChanged -= permHandlers[i];
+                        cb.Checked = moduleCheckBox.Checked;
+                        cb.CheckedChanged += permHandlers[i];
+                        i++;
+                    }
+                }
+
+                moduleCheckBox.CheckedChanged += ModuleCheckHandler;
+                modulePanel.Controls.Add(permissionPanel);
+
+                // Expand/Collapse event
+                btnToggle.Click += (s, e) =>
+                {
+                    permissionPanel.Visible = !permissionPanel.Visible;
+                    btnToggle.Text = permissionPanel.Visible ? "▼" : "▶";
+                    UpdateModuleHeight(modulePanel, headerPanel, permissionPanel);
+                    Reflow();
+                };
+
+                UpdateModuleHeight(modulePanel, headerPanel, permissionPanel);
+                flpRole.Controls.Add(modulePanel);
+            }
+            Reflow();
+        }
+
+        private void ApplyRolePermissionsToUI()
+        {
+            if (_selectedRole == null) return;
+
+            var rolePermissionNames = _selectedRole.RolePermissions
+                .Select(rp => rp.Permission.Name)
+                .ToHashSet();
+
+            foreach (var modulePanel in flpRole.Controls.OfType<Panel>())
+            {
+                foreach (var permissionPanel in modulePanel.Controls.OfType<Panel>())
+                {
+                    foreach (var cb in permissionPanel.Controls.OfType<CheckBox>())
+                    {
+                        if (cb.Tag is Permission perm)
+                        {
+                            cb.Checked = rolePermissionNames.Contains(perm.Name);
+                        }
+                    }
+                }
+            }
+        }
+
+        private async Task InsertOrUpdateRole(Func<Role, Task> action)
+        {
+            var selectedPermissions = new List<Permission>();
+
+            foreach (var modulePanel in flpRole.Controls.OfType<Panel>())
+            {
+                foreach (var permissionPanel in modulePanel.Controls.OfType<Panel>())
+                {
+                    foreach (var cb in permissionPanel.Controls.OfType<CheckBox>())
+                    {
+                        if (cb.Checked && cb.Tag is Permission perm)
+                            selectedPermissions.Add(perm);
+                    }
+                }
+            }
+
+            var newRole = new Role
+            {
+                Name = txbRoleName.Text,
+                IsActive = cbIsActiveRole.SelectedItem?.ToString() == "Active",
+                RolePermissions = selectedPermissions
+                    .Select(p => new RolePermission { PermissionId = p.Id })
+                    .ToList()
+                };
+
+            if (roleAction != "ADD" && _selectedRole != null)
+            {
+                newRole.Id = _selectedRole.Id;
+            }
+
+            await action(newRole);
+
+            await GetListRole();
+        }
+
+        public async Task GetListRole()
+        {
+            string searchTerm = txbSearchRole.Text == "Search role" ? null : txbSearchRole.Text;
+            var result = await RoleService.Instance.GetListRole(_pageSize, _currentPageRole, searchTerm);
+
+            if (result == null || !result.Items.Any())
+            {
+                dtgvRole.DataSource = null;
+                return;
+            }
+
+            _roles = result.Items.ToList();
+
+            var rolesWithString = _roles.Select(r => new
+            {
+                r.Id,
+                r.Name,
+                IsActive = r.IsActive ? "Active" : "Inactive",
+                Permissions = string.Join(", ", r.RolePermissions.Select(rp => rp.Permission.Name))
+            }).ToList();
+
+            rolelist.DataSource = rolesWithString;
+
+            dtgvRole.DataSource = rolelist;
+
+            if (dtgvRole.Columns.Contains("Permissions"))
+            {
+                dtgvRole.Columns["Permissions"].Visible = false;
+            }
+
+            _totalPagesRole = result.TotalPages;
+
+            LayoutForm.RenderPagination(
+                rolePaginatePanel,
+                _currentPageRole,
+                _totalPagesRole,
+                async (newPage) =>
+                {
+                    _currentPageRole = newPage;
+                    await GetListRole();
+                }
+            );
+
+            cbIsActiveRole.DataSource = new List<string> { "Active", "Inactive" };
+
+            BindRoleData();
+        }
+
+        private async Task LoadDataIntoCombobox<T>(ComboBox comboBox, Func<Task<PaginatedResult<T>>> dataFetcher)
+        {
+            var result = await dataFetcher();
+            var items = result?.Items ?? new List<T>();
+
+            if (typeof(T) == typeof(Role))
+            {
+                items = items
+                    .Cast<Role>()        
+                    .Where(r => r.IsActive)
+                    .Cast<T>()            
+                    .ToList();
+            }
+
+            comboBox.DataSource = items;
+            comboBox.DisplayMember = "Name";
+            comboBox.ValueMember = "Id";
+        }
+
         private async Task LoadQuestionsByQuizId(int quizId)
         {
             selectedQuizId = quizId;
@@ -92,16 +467,22 @@ namespace Lab_8.Forms
             panel8.AutoScroll = true;
 
             int y = 10;
-            int questionPanelPadding = 10; // padding inside question panel
-            int answerPadding = 5;          // padding inside answer group
+            int questionPanelPadding = 10;
+            int answerPadding = 5;
 
             foreach (var q in questionList)
             {
+                // Calculate dynamic height
+                int questionHeight = 40; // question label + textbox
+                int pictureRowHeight = 100; // PictureBox row height
+                int answersHeight = 35 * q.Answers.Count + 30; // estimated height for answers
+                int panelHeight = questionHeight + pictureRowHeight + answersHeight + 30;
+
                 // Question Panel
                 var questionPanel = new Panel
                 {
                     Width = panel8.Width - 40,
-                    Height = 226, 
+                    Height = panelHeight,
                     Left = 10,
                     Top = y,
                     BorderStyle = BorderStyle.FixedSingle,
@@ -109,7 +490,7 @@ namespace Lab_8.Forms
                     AutoScroll = true
                 };
 
-                // Question Label
+                // Question Label and TextBox
                 var lbl = new Label { Text = "Question:", Left = 10, Top = 10, Width = 70 };
                 questionPanel.Controls.Add(lbl);
 
@@ -131,18 +512,104 @@ namespace Lab_8.Forms
                 questionPanel.Controls.Add(btnAddQ);
                 if (questionList.Count > 1) questionPanel.Controls.Add(btnRemoveQ);
 
-                // GroupBox for Answers (handles radio grouping)
+                // --- PictureBox ---
+                var pic = new PictureBox
+                {
+                    Left = 10,
+                    Top = lbl.Bottom + 10,
+                    Width = 163,
+                    Height = 100,
+                    SizeMode = PictureBoxSizeMode.Zoom,
+                    BorderStyle = BorderStyle.FixedSingle,
+                    Cursor = Cursors.Hand
+                };
+                if (q.Image != null)
+                    using (var ms = new MemoryStream(q.Image))
+                        pic.Image = Image.FromStream(ms);
+
+                pic.Click += (s, e) =>
+                {
+                    using (OpenFileDialog dlg = new OpenFileDialog())
+                    {
+                        dlg.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.gif;*.bmp";
+                        dlg.Title = "Select Question Image";
+
+                        if (dlg.ShowDialog() == DialogResult.OK)
+                        {
+                            q.Image = File.ReadAllBytes(dlg.FileName);
+                            pic.Image = Image.FromFile(dlg.FileName);
+                        }
+                    }
+                };
+                questionPanel.Controls.Add(pic);
+
+                // --- Upload Audio Button (same row) ---
+                var btnUploadAudio = new Button
+                {
+                    Text = "Upload Audio",
+                    Left = pic.Right + 10,
+                    Top = pic.Top,
+                    Width = 100,
+                    Height = 27
+                };
+                btnUploadAudio.Click += (s, e) =>
+                {
+                    using (OpenFileDialog dlg = new OpenFileDialog())
+                    {
+                        dlg.Filter = "Audio Files|*.wav;*.mp3";
+                        dlg.Title = "Select Question Audio";
+
+                        if (dlg.ShowDialog() == DialogResult.OK)
+                        {
+                            q.Audio = File.ReadAllBytes(dlg.FileName);
+                            RenderQuestionList(); // refresh to show Play/Stop buttons
+                        }
+                    }
+                };
+                questionPanel.Controls.Add(btnUploadAudio);
+
+                // --- Play / Stop Audio Buttons (if audio exists) ---
+                if (q.Audio != null)
+                {
+                    var btnPlayPause = new Button
+                    {
+                        Text = "Play",
+                        Left = btnUploadAudio.Right + 5,
+                        Top = pic.Top,
+                        Width = 100,
+                        Height = 27
+                    };
+
+                    btnPlayPause.Click += (s, e) =>
+                    {
+                        if (q.WaveOut != null && q.WaveOut.PlaybackState == PlaybackState.Playing)
+                        {
+                            Helper.PauseAudio(q);   
+                            btnPlayPause.Text = "Play";
+                        }
+                        else
+                        {
+                            Helper.PlayAudio(q, btnPlayPause);
+                            btnPlayPause.Text = "Pause";
+                        }
+                    };
+                    questionPanel.Controls.Add(btnPlayPause);
+                }
+
+                // --- GroupBox for Answers ---
+                int answersTop = pic.Bottom + 10; // start below PictureBox row
                 var answerGroup = new GroupBox
                 {
                     Text = "Answers",
-                    Top = lbl.Bottom + 10,
+                    Top = answersTop,
                     Left = 10,
                     Width = questionPanel.Width - 2 * questionPanelPadding,
-                    Height = questionPanel.Height - lbl.Bottom - 20,
+                    Height = panelHeight - answersTop - 10,
                     Padding = new Padding(answerPadding)
                 };
                 questionPanel.Controls.Add(answerGroup);
 
+                // --- Add answers ---
                 int yAnswer = 30;
                 foreach (var a in q.Answers)
                 {
@@ -157,10 +624,8 @@ namespace Lab_8.Forms
                     {
                         if (rb.Checked)
                         {
-                            //Uncheck current answer
                             foreach (var ans in q.Answers)
                                 ans.IsCorrect = false;
-
                             a.IsCorrect = true;
                         }
                     };
@@ -168,7 +633,7 @@ namespace Lab_8.Forms
 
                     var txbAnswer = new TextBox
                     {
-                        Top = yAnswer - 5 ,
+                        Top = yAnswer - 5,
                         Left = rb.Right + 5,
                         Width = 300,
                         Text = a.Name,
@@ -177,7 +642,7 @@ namespace Lab_8.Forms
                     txbAnswer.TextChanged += (s, e) => a.Name = txbAnswer.Text.TrimStart();
                     answerGroup.Controls.Add(txbAnswer);
 
-                    // Add / Remove Answer Buttons
+                    // Add / Remove buttons
                     var btnAddA = new Button { Text = "+", Left = txbAnswer.Right + 5, Top = yAnswer - 4, Width = 30, Enabled = q.Answers.Count < 4 };
                     var btnRemoveA = new Button { Text = "-", Left = btnAddA.Right + 5, Top = yAnswer - 4, Width = 30 };
                     btnAddA.Click += (s, e) => AddAnswer(q);
@@ -232,12 +697,15 @@ namespace Lab_8.Forms
             { 
                 //User
                 userPaginatePanel, userEmailPanel, userPasswordPanel,
-                userTablePanel, userImagePanel, userNamePanel,
+                userTablePanel, userImagePanel, userNamePanel, userRolePanel,
                 //Quiz-QA
                 panel8, listQuizPanel,
                 //Quiz
                 quizDifficultyPanel, quizImagePanel, quizPaginatePanel,
-                quizNamePanel, quizTablePanel,
+                quizNamePanel, quizTablePanel, quizCategoryPanel,
+                //Role
+                roleNamePanel, roleIsActivePanel, flpRole,
+                rolePaginatePanel, roleTablePanel, moduleListPanel
             }).Cast<Panel>())
             {
                 UIStyle.RoundPanel(panel, 15);
@@ -248,9 +716,9 @@ namespace Lab_8.Forms
             var imageProp = entityObj.GetType().GetProperty("Image");
             if (imageProp?.GetValue(entityObj) is byte[] imageBytes && imageBytes.Length > 0)
             {
-                using (var ms = new System.IO.MemoryStream(imageBytes))
+                using (var ms = new MemoryStream(imageBytes))
                 {
-                    pictureBox.Image = System.Drawing.Image.FromStream(ms);
+                    pictureBox.Image = Image.FromStream(ms);
                     pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
                 }
             }
@@ -259,6 +727,7 @@ namespace Lab_8.Forms
                 pictureBox.Image = null;
             }
         }
+
         private void DisplaySelectedUserImage(DataGridView dataGridView, PictureBox pictureBox)
         {
             if (dataGridView.CurrentRow?.DataBoundItem is object entityObj)
@@ -311,25 +780,37 @@ namespace Lab_8.Forms
 
         private void BindUserData()
         {
-            ClearControlBindings(txbUserEmail, txbUserName, txbUserPassword);
+            ClearControlBindings(txbUserEmail, txbUserName, txbUserPassword, cbUserRole);
 
             if (userlist == null || userlist.Count == 0) return;
 
             txbUserEmail.DataBindings.Add("Text", userlist, "Email", true, DataSourceUpdateMode.Never);
             txbUserName.DataBindings.Add("Text", userlist, "Name", true, DataSourceUpdateMode.Never);
             txbUserPassword.DataBindings.Add("Text", userlist, "Password", true, DataSourceUpdateMode.Never);
+            cbUserRole.DataBindings.Add("Text", userlist, "Role", true, DataSourceUpdateMode.Never);
 
             dtgvUser.SelectionChanged += (s, e) => DisplaySelectedUserImage(dtgvUser, pbUserImage);
         }
 
+        private void BindRoleData()
+        {
+            ClearControlBindings(txbRoleName, cbIsActiveRole);
+
+            if (rolelist == null || rolelist.Count == 0) return;
+
+            txbRoleName.DataBindings.Add("Text", rolelist, "Name", true, DataSourceUpdateMode.Never);
+            cbIsActiveRole.DataBindings.Add("SelectedItem", rolelist, "IsActive", true, DataSourceUpdateMode.Never);
+        }
+
         private void BindQuizData()
         {
-            ClearControlBindings(txbQuizName, cbQuizDifficulty);
+            ClearControlBindings(txbQuizName, cbQuizDifficulty, cbQuizCategory);
 
             if (quizlist == null || quizlist.Count == 0) return;
 
             txbQuizName.DataBindings.Add("Text", quizlist, "Name", true, DataSourceUpdateMode.Never);
             cbQuizDifficulty.DataBindings.Add("Text", quizlist, "Difficulty", true, DataSourceUpdateMode.Never);
+            cbQuizCategory.DataBindings.Add("Text", quizlist, "Category", true, DataSourceUpdateMode.Never);
 
             dtgvQuiz.SelectionChanged += (s, e) => DisplaySelectedQuizImage(dtgvQuiz, pbQuizImage);
         }
@@ -353,7 +834,8 @@ namespace Lab_8.Forms
                 u.Email,
                 u.Name,
                 u.Password,
-                u.Image
+                u.Image,
+                Role = u.Role.Name
             }).ToList();
 
             dtgvUser.DataSource = userlist;
@@ -399,7 +881,8 @@ namespace Lab_8.Forms
                 u.Id,
                 u.Name,
                 u.Difficulty,
-                u.Image
+                u.Image,
+                Category = u.Category.Name,
             }).ToList();
 
             dtgvQuiz.DataSource = quizlist;
@@ -427,27 +910,19 @@ namespace Lab_8.Forms
             DisplaySelectedQuizImage(dtgvQuiz, pbQuizImage);
         }
 
-        private async Task LoadQuizListToComboBox()
-        {
-            var result = await QuizService.Instance.GetListQuiz(100, 1, null);
-
-            cbQuizName.DataSource = result.Items;
-            cbQuizName.DisplayMember = "Name";
-        }
-
         private async Task ReloadUser()
         {
             await LoadUserList();
 
             ButtonAction(new Button[] { btnEditUser, btnDeleteUser, btnAddUser }, true);
-            ButtonAction(new Button[] { btnSaveUser, btnCancelUser }, false);
+            ButtonAction(new Button[] { btnSaveUser, btnCancelUser, btnUploadUserImage }, false);
 
             selectedUserImageBytes = null;
 
             txbUserPassword.ReadOnly = true;
-            txbUserEmail.ReadOnly = true;   
+            txbUserEmail.ReadOnly = true;
 
-            btnUploadUserImage.Enabled = false;
+            userAction = null;
 
             DisplaySelectedUserImage(dtgvUser, pbUserImage);
         }
@@ -461,11 +936,41 @@ namespace Lab_8.Forms
 
             selectedQuizImageBytes = null;
 
-            btnUploadQuiz.Enabled = false;
-
             DisplaySelectedQuizImage(dtgvQuiz, pbQuizImage);
 
+            quizAction = null;
+
             await _home.LoadQuiz();
+        }
+
+        private async Task ReloadRole()
+        {
+            await GetListRole();
+
+            ButtonAction(new Button[] { btnAddRole, btnEditRole, btnDeleteRole }, true);
+            ButtonAction(new Button[] { btnSaveRole, btnCancelRole }, false);
+
+            ApplyRolePermissionsToUI();
+
+            await LoadDataIntoCombobox(
+                cbUserRole,
+                () => RoleService.Instance.GetListRole(100, 1, null));
+
+            roleAction = null;
+        }
+
+        private void ClearAllCheckoxPermission()
+        {
+            foreach (var modulePanel in flpRole.Controls.OfType<Panel>())
+            {
+                foreach (var permissionPanel in modulePanel.Controls.OfType<Panel>())
+                {
+                    foreach (var cb in permissionPanel.Controls.OfType<CheckBox>())
+                    {
+                        cb.Checked = false;
+                    }
+                }
+            }
         }
         #endregion
 
@@ -473,10 +978,29 @@ namespace Lab_8.Forms
         public async void LoadData(object sender, EventArgs e)
         {
             var userTask = LoadUserList();
-            var quizTaskToComboBox = LoadQuizListToComboBox();
             var quizTask = LoadQuizList();
+            var groupPermissionTask = LoadGroupPermission();
+            var roleTask = GetListRole();
 
-            await Task.WhenAll(userTask, quizTaskToComboBox, quizTask);
+            var quizTaskToComboBox = LoadDataIntoCombobox(
+                cbQuizName,
+                () => QuizService.Instance.GetListQuiz(100, 1, null));
+            var quizCategoryToComboBoxTask = LoadDataIntoCombobox(
+                cbQuizCategory, 
+                () => CategoryService.Instance.GetListCategory(100, 1, null));
+            var userRoleToComboBoxTask = LoadDataIntoCombobox(
+                cbUserRole,
+                () => RoleService.Instance.GetListRole(100, 1, null));
+
+            await Task.WhenAll(
+                userTask, 
+                quizTaskToComboBox, 
+                quizTask, 
+                quizCategoryToComboBoxTask, 
+                userRoleToComboBoxTask,
+                groupPermissionTask,
+                roleTask
+            );
 
             if (cbQuizName.SelectedItem is Quiz selectedQuiz)
             {
@@ -496,7 +1020,7 @@ namespace Lab_8.Forms
             ButtonAction(new Button[] { btnEditUser, btnDeleteUser, btnAddUser }, false);
             ButtonAction(new Button[] { btnSaveUser, btnCancelUser, btnUploadUserImage }, true);
 
-            ClearControlBindings(txbUserEmail, txbUserName, txbUserPassword);
+            ClearControlBindings(txbUserEmail, txbUserName, txbUserPassword, cbUserRole);
 
             userAction = "ADD";
 
@@ -512,12 +1036,24 @@ namespace Lab_8.Forms
             ButtonAction(new Button[] { btnEditQuiz, btnAddQuiz, btnDeleteQuiz }, false);
             ButtonAction(new Button[] { btnSaveQuiz, btnCancelQuiz, btnUploadQuiz }, true);
 
-            ClearControlBindings(txbQuizName, cbQuizDifficulty);
+            ClearControlBindings(txbQuizName, cbQuizDifficulty, cbQuizCategory);
 
             quizAction = "ADD";
 
             selectedQuizImageBytes = null;
             pbQuizImage.Image = null;
+        }
+
+        private void btnAddRole_Click(object sender, EventArgs e)
+        {
+            ButtonAction(new Button[] { btnAddRole, btnEditRole, btnDeleteRole }, false);
+            ButtonAction(new Button[] { btnSaveRole, btnCancelRole }, true);
+
+            ClearControlBindings(txbRoleName, cbIsActiveRole);
+
+            roleAction = "ADD";
+
+            ClearAllCheckoxPermission();
         }
 
         private void btnCancelUser_Click(object sender, EventArgs e)
@@ -530,6 +1066,8 @@ namespace Lab_8.Forms
             txbUserPassword.ReadOnly = true;
             txbUserEmail.ReadOnly = true;
 
+            userAction = null;
+
             DisplaySelectedUserImage(dtgvUser, pbUserImage);
         }
 
@@ -540,7 +1078,21 @@ namespace Lab_8.Forms
 
             BindQuizData();
 
+            quizAction = null;
+
             DisplaySelectedUserImage(dtgvQuiz, pbQuizImage);
+        }
+
+        private void btnCancelRole_Click(object sender, EventArgs e)
+        {
+            ButtonAction(new Button[] { btnAddRole, btnEditRole, btnDeleteRole }, true);
+            ButtonAction(new Button[] { btnSaveRole, btnCancelRole }, false);
+
+            BindRoleData();
+
+            ApplyRolePermissionsToUI();
+
+            roleAction = null;
         }
 
         private async void btnSaveUser_Click(object sender, EventArgs e)
@@ -554,6 +1106,7 @@ namespace Lab_8.Forms
                         Email = txbUserEmail.Text,  
                         Password = BCrypt.Net.BCrypt.HashPassword(txbUserPassword.Text),
                         Image = selectedUserImageBytes,
+                        RoleId = (int)cbUserRole.SelectedValue
                     };
 
                     await UserService.Instance.CreateUser(user);
@@ -578,6 +1131,7 @@ namespace Lab_8.Forms
                         Name = txbUserName.Text,
                         Email = txbUserEmail.Text,
                         Image = imageToSave,
+                        RoleId = (int)cbUserRole.SelectedValue
                     };
 
                     var updatedUser = await UserService.Instance.UpdateUser(updateToUser);
@@ -592,7 +1146,7 @@ namespace Lab_8.Forms
                 break;
 
                 default:
-                    MessageBox.Show("Invalid action", "Error");
+                    Alert.ShowAlert("Invalid action", Alert.AlertType.Error);
                 break;
             }
         }
@@ -606,7 +1160,8 @@ namespace Lab_8.Forms
                     {
                         Name = txbQuizName.Text,
                         Difficulty = cbQuizDifficulty.Text,
-                        Image = selectedQuizImageBytes
+                        Image = selectedQuizImageBytes,
+                        CategoryId = (int)cbQuizCategory.SelectedValue
                     };
 
                     await QuizService.Instance.CreateQuiz(quiz);
@@ -630,7 +1185,8 @@ namespace Lab_8.Forms
                         Id = quizId,
                         Name = txbQuizName.Text,
                         Difficulty = cbQuizDifficulty.Text,
-                        Image = imageToSave
+                        Image = imageToSave,
+                        CategoryId = (int)cbQuizCategory.SelectedValue
                     };
 
                     await QuizService.Instance.UpdateQuiz(updateQuiz);
@@ -639,7 +1195,27 @@ namespace Lab_8.Forms
                 break;
 
                 default:
-                    MessageBox.Show("Invalid action", "Error");
+                    Alert.ShowAlert("Invalid action", Alert.AlertType.Error);
+                break;
+            }
+        }
+
+        private async void btnSaveRole_Click(object sender, EventArgs e)
+        {
+            switch (roleAction)
+            {
+                case "ADD":
+                    await InsertOrUpdateRole(RoleService.Instance.InsertRole);
+                    await ReloadRole();
+                break;
+
+                case "EDIT":
+                    await InsertOrUpdateRole(RoleService.Instance.UpdateRole);
+                    await ReloadRole();
+                break;
+
+                default:
+                    Alert.ShowAlert("Invalid action", Alert.AlertType.Error);
                 break;
             }
         }
@@ -652,6 +1228,14 @@ namespace Lab_8.Forms
         private void btnUploadQuiz_Click(object sender, EventArgs e)
         {
             selectedQuizImageBytes = Helper.UploadImage(quizFileDialog, pbQuizImage);
+        }
+
+        private void btnEditRole_Click(object sender, EventArgs e)
+        {
+            ButtonAction(new Button[] { btnAddRole, btnEditRole, btnDeleteRole }, false);
+            ButtonAction(new Button[] { btnSaveRole, btnCancelRole }, true);
+
+            roleAction = "EDIT";
         }
 
         private void btnEditUser_Click(object sender, EventArgs e)
@@ -672,35 +1256,40 @@ namespace Lab_8.Forms
 
         private async void btnDeleteUser_Click(object sender, EventArgs e)
         {
-            DialogResult result = MessageBox.Show(
-                "Are you sure you want to delete this user?",
-                "Confirm Delete",
-                MessageBoxButtons.OKCancel,
-                MessageBoxIcon.Warning
-            );
+            bool confirm = Confirmation.ShowConfirm("Confirm Delete",
+              "Are you sure you want to delete this user?");
 
-            if (result == DialogResult.OK)
+            if (confirm)
             {
                 await UserService.Instance.DeleteUser(selectedUserId);
-                MessageBox.Show("User deleted successfully.", "Deleted", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
                 await ReloadUser();
             }
         }
 
         private async void btnDeleteQuiz_Click(object sender, EventArgs e)
         {
-            DialogResult result = MessageBox.Show(
-                "Are you sure you want to delete this quiz?",
-                "Confirm Delete",
-                MessageBoxButtons.OKCancel,
-                MessageBoxIcon.Warning
-            );
+            bool confirm = Confirmation.ShowConfirm("Confirm Delete",
+              "Are you sure you want to delete this quiz?");
 
-            if (result == DialogResult.OK)
+            if (confirm)
             {
                 await QuizService.Instance.DeleteQuiz(quizId);
-                MessageBox.Show("Quiz deleted successfully.", "Deleted", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
                 await ReloadQuiz();
+            }
+        }
+
+        private async void btnDeleteRole_Click(object sender, EventArgs e)
+        {
+            bool confirm = Confirmation.ShowConfirm("Confirm Delete",
+              "Are you sure you want to delete this role?");
+
+            if (confirm)
+            {
+                await RoleService.Instance.DeleteRole(_selectedRole.Id);
+
+                await ReloadRole();
             }
         }
 
@@ -723,6 +1312,21 @@ namespace Lab_8.Forms
         private async void txbSearchQuiz_TextChanged(object sender, EventArgs e)
         {
             await LoadQuizList();
+        }
+
+        private void dtgvRole_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dtgvRole.CurrentRow != null)
+            {
+                int roleId = (int)dtgvRole.CurrentRow.Cells["Id"].Value;
+                _selectedRole = _roles.FirstOrDefault(r => r.Id == roleId);
+                ApplyRolePermissionsToUI();
+            }
+        }
+
+        private async void txbSearchRole_TextChanged(object sender, EventArgs e)
+        {
+            await GetListRole();
         }
         #endregion
     }

@@ -75,6 +75,14 @@ namespace Lab_8.Services
             }
         }
 
+        public async Task<int> GetFirstHistoryId()
+        {
+            using (var context = new QuizDBContext())
+            {
+                return (await context.Histories.FirstAsync()).Id;    
+            }
+        }
+
         public async Task SubmitQuizHistory(History history, List<Answer> checkedAnswers)
         {
             using (var context = new QuizDBContext())

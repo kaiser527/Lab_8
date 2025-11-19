@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text.Json;
-using Lab_8.Models;
 
 namespace Lab_8.Services
 {
@@ -10,24 +8,19 @@ namespace Lab_8.Services
         private static readonly string filePath =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "quiz_user.json");
 
-        public static void SaveUser(User user)
+        public static void SaveUserId(int userId)
         {
-            var json = JsonSerializer.Serialize(new
-            {
-                user.Id,
-                user.Email,
-                user.Name,
-                user.Image
-            });
-            File.WriteAllText(filePath, json);
+            File.WriteAllText(filePath, userId.ToString());
         }
 
-        public static User LoadUser()
+        public static int? LoadUserId()
         {
             if (!File.Exists(filePath)) return null;
 
-            var json = File.ReadAllText(filePath);
-            return JsonSerializer.Deserialize<User>(json);
+            if (int.TryParse(File.ReadAllText(filePath), out int userId))
+                return userId;
+
+            return null;
         }
 
         public static void ClearUser()

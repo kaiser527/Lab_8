@@ -67,6 +67,8 @@ namespace Lab_8.Services
 
                     // Update question fields
                     dbQuestion.Name = q.Name;
+                    dbQuestion.Image = q.Image;
+                    dbQuestion.Audio = q.Audio;
 
                     // --- Handle Answers ---
                     // 1. New answers to add

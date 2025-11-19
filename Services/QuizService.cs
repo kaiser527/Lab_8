@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WinFormApp.DTO;
+using WinFormApp.Forms;
 
 namespace Lab_8.Services
 {
@@ -32,12 +33,16 @@ namespace Lab_8.Services
         {
             using (var context = new QuizDBContext())
             {
-                var query = context.Quizzes.AsQueryable();
+                var query = context.Quizzes
+                    .Include(q => q.Category)
+                    .AsQueryable();
 
                 if (!string.IsNullOrEmpty(name))
                 {
                     query = query.Where(a =>
-                        a.Name.ToLower().Contains(name.ToLower())
+                        a.Name.ToLower().Contains(name.ToLower()) ||
+                        a.Category.Name.ToLower().Contains(name.ToLower()) ||
+                        a.Difficulty.ToLower().Contains(name.ToLower())
                     );
                 }
 
@@ -70,7 +75,7 @@ namespace Lab_8.Services
 
                 if (existingQuiz == null)
                 {
-                    MessageBox.Show("Quiz is not exists", "Error");
+                    Alert.ShowAlert("Quiz is not exists", Alert.AlertType.Error);
                     return null;
                 }
 
@@ -86,7 +91,7 @@ namespace Lab_8.Services
 
                 if (isExist)
                 {
-                    MessageBox.Show("Quiz is already exists", "Create failed");
+                    Alert.ShowAlert("Quiz is already exists", Alert.AlertType.Error);
                     return;
                 }
 
@@ -104,7 +109,7 @@ namespace Lab_8.Services
 
                 if (existingQuiz == null)
                 {
-                    MessageBox.Show("Quiz is not exists", "Update failed");
+                    Alert.ShowAlert("Quiz is not exists", Alert.AlertType.Error);
                     return;
                 }
 
@@ -112,13 +117,14 @@ namespace Lab_8.Services
 
                 if (isExist)
                 {
-                    MessageBox.Show("Quiz is already exists", "Update failed");
+                    Alert.ShowAlert("Quiz is already exists", Alert.AlertType.Error);
                     return;
                 }
 
                 existingQuiz.Name = quiz.Name;
                 existingQuiz.Difficulty = quiz.Difficulty;
                 existingQuiz.Image = quiz.Image;
+                existingQuiz.CategoryId = quiz.CategoryId;  
 
                 await context.SaveChangesAsync();   
             }
@@ -132,7 +138,7 @@ namespace Lab_8.Services
 
                 if (existingQuiz == null)
                 {
-                    MessageBox.Show("Quiz is not exists", "Update failed");
+                    Alert.ShowAlert("Quiz is not exists", Alert.AlertType.Error);
                     return;
                 }
 

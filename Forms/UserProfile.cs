@@ -5,6 +5,7 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using WinFormApp.Forms;
 
 namespace Lab_8.Forms
 {
@@ -117,7 +118,7 @@ namespace Lab_8.Forms
 
             // Show all errors at once
             if (!isValid)
-                MessageBox.Show(errorMessage, "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Alert.ShowAlert(errorMessage, Alert.AlertType.Error);
 
             return isValid;
         }
@@ -145,8 +146,7 @@ namespace Lab_8.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to load image: " + ex.Message, "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Alert.ShowAlert("Failed to load image: " + ex.Message, Alert.AlertType.Error);
             }
         }
 
@@ -180,8 +180,7 @@ namespace Lab_8.Forms
             }
             else
             {
-                MessageBox.Show("Failed to update profile. Please check your current password or try again later.",
-                    "Update Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Alert.ShowAlert("Failed to update profile. Please check your current password or try again later.", Alert.AlertType.Error);
                 return;
             }
         }

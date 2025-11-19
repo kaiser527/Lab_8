@@ -3,6 +3,7 @@ using Lab_8.Services;
 using Lab_8.Utils;
 using System;
 using System.Windows.Forms;
+using WinFormApp.Forms;
 
 namespace Lab_8
 {
@@ -46,7 +47,7 @@ namespace Lab_8
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password) ||
                 txbUserEmail.Text == "User Email..." || txbUserPassword.Text == "User Password...")
             {
-                MessageBox.Show("Missing information", "Alert");
+                Alert.ShowAlert("Missing information", Alert.AlertType.Warning);
                 return;
             }
 
@@ -60,7 +61,7 @@ namespace Lab_8
                 {
                     if (chkRememberMe.Checked)
                     {
-                        LocalStorage.SaveUser(user);
+                        LocalStorage.SaveUserId(user.Id);
                     }
                     else
                     {
@@ -73,12 +74,12 @@ namespace Lab_8
                 }
                 else
                 {
-                    MessageBox.Show("Incorrect email or password", "Error");
+                    Alert.ShowAlert("Incorrect username or password", Alert.AlertType.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}", "Error");
+                Alert.ShowAlert($"Error: {ex.Message}", Alert.AlertType.Error);
             }
             finally
             {
@@ -94,22 +95,6 @@ namespace Lab_8
             Close();
         }
 
-        private void Login_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            DialogResult result = MessageBox.Show(
-                "Are you sure you want to exit the program?",
-                "Exit Confirmation",
-                MessageBoxButtons.OKCancel,
-                MessageBoxIcon.Question
-            );
-
-            if (result == DialogResult.Cancel)
-            {
-                e.Cancel = true; // Prevent closing
-            }
-        }
-        #endregion
-
         private void textBoxPassword_TextChanged(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(txbUserPassword.Text) || txbUserPassword.Text == "User Password...")
@@ -121,5 +106,6 @@ namespace Lab_8
                 txbUserPassword.UseSystemPasswordChar = true;
             }
         }
+        #endregion
     }
 }

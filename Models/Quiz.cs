@@ -14,8 +14,14 @@ namespace Lab_8.Models
         public string Name { get; set; }
 
         [Required]
+        public int CategoryId { get; set; }
+
+        [Required]
         [MaxLength(100)]
         public string Difficulty { get; set; }
+
+        [ForeignKey("CategoryId")]
+        public Category Category { get; set; }
 
         public ICollection<Question> Questions { get; set; } = new List<Question>();
 

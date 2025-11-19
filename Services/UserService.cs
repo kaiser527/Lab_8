@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WinFormApp.DTO;
+using WinFormApp.Forms;
 
 namespace Lab_8.Services
 {
@@ -33,6 +34,9 @@ namespace Lab_8.Services
             using (var context = new QuizDBContext())
             {
                 User user = await context.Users
+                    .Include(u => u.Role)
+                        .ThenInclude(r => r.RolePermissions)
+                            .ThenInclude(rp => rp.Permission)
                     .FirstOrDefaultAsync(u => u.Email == email);
 
                 if (user == null) return (null, false);
@@ -55,7 +59,7 @@ namespace Lab_8.Services
 
                 if (user == null)
                 {
-                    MessageBox.Show("User is not exists", "Update failed");
+                    Alert.ShowAlert("User is not exists", Alert.AlertType.Error);
                     isClose = false;
                 }
 
@@ -63,13 +67,13 @@ namespace Lab_8.Services
 
                 if (!success)
                 {
-                    MessageBox.Show("Password is incorrect", "Update failed");
+                    Alert.ShowAlert("Password is incorrect", Alert.AlertType.Error);
                     isClose = false;
                 }
 
                 if (updateUserProfile.ConfirmPassword != updateUserProfile.NewPassword)
                 {
-                    MessageBox.Show("Password and confirm password not match", "Update failed");
+                    Alert.ShowAlert("Password and confirm password not match", Alert.AlertType.Error);
                     isClose = false;
                 }
 
@@ -94,13 +98,16 @@ namespace Lab_8.Services
         {
             using (var context = new QuizDBContext())
             {
-                var query = context.Users.AsQueryable();
+                var query = context.Users
+                    .Include(u => u.Role)
+                    .AsQueryable();
 
                 if (!string.IsNullOrEmpty(name))
                 {
                     query = query.Where(a =>
                         a.Name.ToLower().Contains(name.ToLower()) ||
-                        a.Email.ToLower().Contains(name.ToLower())
+                        a.Email.ToLower().Contains(name.ToLower()) ||
+                        a.Role.Name.ToLower().Contains(name.ToLower())
                     );
                 }
 
@@ -129,7 +136,7 @@ namespace Lab_8.Services
 
                 if (isExist)
                 {
-                    MessageBox.Show("User already exists", "Create failed");
+                    Alert.ShowAlert("User already exists", Alert.AlertType.Error);
                     return;
                 }
 
@@ -142,11 +149,15 @@ namespace Lab_8.Services
         {
             using (var context = new QuizDBContext())
             {
-                var existingUser = await context.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
+                var existingUser = await context.Users
+                    .Include(u => u.Role)
+                       .ThenInclude(r => r.RolePermissions)
+                           .ThenInclude(rp => rp.Permission)
+                    .FirstOrDefaultAsync(u => u.Id == user.Id);
 
                 if (existingUser == null)
                 {
-                    MessageBox.Show("User not found", "Update failed");
+                    Alert.ShowAlert("User not found", Alert.AlertType.Error);
                     return null;
                 }
 
@@ -169,13 +180,13 @@ namespace Lab_8.Services
 
                 if (user == null)
                 {
-                    MessageBox.Show("User not found", "Delete failed");
+                    Alert.ShowAlert("User not found", Alert.AlertType.Error);
                     return;
                 }
 
                 if(user.Id == User.Id)
                 {
-                    MessageBox.Show("Cannot delete yourself", "Delete failed");
+                    Alert.ShowAlert("Cannot delete yourself", Alert.AlertType.Error);
                     return;
                 }
 

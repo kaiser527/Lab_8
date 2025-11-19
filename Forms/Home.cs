@@ -24,11 +24,32 @@ namespace Lab_8.Forms
         public Home()
         {
             InitializeComponent();
+            ApplyRoleBase();
             StylePanels();
             Load += load_Data;
         }
 
         #region Methods
+        private void ApplyRoleBase()
+        {
+            var role = UserService.Instance.User.Role;
+
+            if (role == null) return;
+
+            if (role.Name != "Admin" && role.Name != "Tester")
+            {
+                toolStripAdminBtn.Visible = false;
+            }
+
+            var permissionNames = role.RolePermissions
+                .Select(rp => rp.Permission.Name)
+                .ToList();
+
+            if (!permissionNames.Contains("View Quiz"))
+            {
+                flpQuiz.Controls.Clear();
+            }
+        }
         public async Task LoadQuiz()
         {
             flpQuiz.Controls.Clear();
@@ -138,19 +159,27 @@ namespace Lab_8.Forms
             {
                 Width = datePickerPanel.Width,
                 Height = 30,
-                Margin = new Padding(0, 0, 0, 0)
+                Margin = new Padding(0)
             };
 
             Button btnReset = new Button
             {
                 Text = "Reset Filter",
-                Width = datePickerPanel.Width / 3,
-                Height = 24,
-                BackColor = Color.LightGray,
+                Width = 80,
+                Height = 26,
+                BackColor = Color.FromArgb(220, 53, 69), // Bootstrap-style red
                 FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 8, FontStyle.Regular)
+                Font = new Font("Segoe UI", 8.3f, FontStyle.Bold),
+                ForeColor = Color.White,
+                Cursor = Cursors.Hand
             };
+
+            // Rounded edges
             btnReset.FlatAppearance.BorderSize = 0;
+
+            // Hover effect: slightly darker red
+            btnReset.MouseEnter += (s, e) => btnReset.BackColor = Color.FromArgb(200, 35, 51);
+            btnReset.MouseLeave += (s, e) => btnReset.BackColor = Color.FromArgb(220, 53, 69);
 
             // Center the button in the panel
             btnReset.Left = (resetPanel.Width - btnReset.Width) / 2;
@@ -184,37 +213,36 @@ namespace Lab_8.Forms
             {
                 Panel emptyPanel = new Panel
                 {
-                    Dock = DockStyle.Fill,
+                    Width = flow.ClientSize.Width - 30,
+                    Height = 300, // set a reasonable height
                     BackColor = Color.WhiteSmoke
                 };
-
-                int topMargin = 170; // keep your topMargin
 
                 Label lblIcon = new Label
                 {
                     Text = "📭",
                     Font = new Font("Segoe UI Emoji", 40),
-                    Height = 100,
-                    Width = historyPanel.ClientSize.Width,
+                    Width = emptyPanel.Width,
+                    Height = 70,
                     TextAlign = ContentAlignment.MiddleCenter,
-                    Top = topMargin
+                    Top = 110
                 };
-                emptyPanel.Controls.Add(lblIcon);
 
                 Label lblEmpty = new Label
                 {
                     Text = "No quiz history yet.\nTry taking a quiz to see it here!",
                     Font = new Font("Segoe UI", 11, FontStyle.Italic),
                     ForeColor = Color.Gray,
-                    Width = historyPanel.ClientSize.Width,
-                    Height = historyPanel.ClientSize.Height - lblIcon.Bottom - 20,
+                    Width = emptyPanel.Width,
+                    Height = 60,
                     TextAlign = ContentAlignment.MiddleCenter,
-                    Top = lblIcon.Bottom - 97
+                    Top = lblIcon.Bottom
                 };
+
+                emptyPanel.Controls.Add(lblIcon);
                 emptyPanel.Controls.Add(lblEmpty);
 
                 flow.Controls.Add(emptyPanel);
-                return 0;
             }
 
             // --- Render history items ---
@@ -262,7 +290,7 @@ namespace Lab_8.Forms
 
                 Label lblScore = new Label
                 {
-                    Text = $"⭐ Score: {h.TotalScore}",
+                    Text = $"⭐ Score: { Math.Round(h.TotalScore, 2) }",
                     AutoSize = true,
                     Font = new Font("Segoe UI", 9, FontStyle.Bold),
                     ForeColor = Color.FromArgb(0, 120, 215),
@@ -512,8 +540,9 @@ namespace Lab_8.Forms
         private async void load_Data(object sender, EventArgs e)
         {
             var quizTask = LoadQuiz();
+            var historyTask = RenderHistoryPagination(await HistoryService.Instance.GetFirstHistoryId());
 
-            await Task.WhenAll(quizTask);
+            await Task.WhenAll(quizTask, historyTask);
 
             var user = UserService.Instance.User;
             toolStripBtnDropdown.Text = user.Name;
