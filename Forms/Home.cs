@@ -145,7 +145,7 @@ namespace Lab_8.Forms
                 Width = (datePickerPanel.Width / 2) - 5,
                 Location = new Point(0, 0)
             };
-            dtpStart.ValueChanged += async (s, e) =>
+            dtpStart.CloseUp += async (s, e) =>
             {
                 _timeStart = dtpStart.Value;
                 _currentPageHistory = 1;
@@ -159,7 +159,7 @@ namespace Lab_8.Forms
                 Width = (datePickerPanel.Width / 2) - 5,
                 Location = new Point(dtpStart.Right + 10, 0)
             };
-            dtpFinish.ValueChanged += async (s, e) =>
+            dtpFinish.CloseUp += async (s, e) =>
             {
                 _timeFinish = dtpFinish.Value;
                 _currentPageHistory = 1;

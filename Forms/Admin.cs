@@ -393,7 +393,7 @@ namespace Lab_8.Forms
                 RolePermissions = selectedPermissions
                     .Select(p => new RolePermission { PermissionId = p.Id })
                     .ToList()
-                };
+            };
 
             if (roleAction != "ADD" && _selectedRole != null)
             {
