@@ -219,6 +219,13 @@ namespace Lab_8.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTime>("CodeExpire")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CodeId")
+                        .HasColumnType("nvarchar(6)")
+                        .HasMaxLength(6);
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)")

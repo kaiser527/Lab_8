@@ -1,6 +1,5 @@
 ﻿using Lab_8.Models;
 using Microsoft.EntityFrameworkCore;
-using NAudio.CoreAudioApi;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -36,7 +35,10 @@ namespace Lab_8.Services
 
                 if (!string.IsNullOrEmpty(permissionname))
                 {
-                    query = query.Where(f => f.Name.ToLower().Contains(permissionname.ToLower()));
+                    query = query.Where(
+                        f => f.Name.ToLower().Contains(permissionname.ToLower()) ||
+                        f.Module.ToLower().Contains(permissionname.ToLower())
+                    );
                 }
 
                 int totalCount = await query.CountAsync();
@@ -87,7 +89,7 @@ namespace Lab_8.Services
                     return;
                 }
 
-                bool isExist = await context.Permissions.AnyAsync(f => f.Name == permission.Name && f.Id != permission.Id);
+                bool isExist = await context.Permissions.AnyAsync(p => p.Name == permission.Name && p.Id != permission.Id);
 
                 if (isExist)
                 {

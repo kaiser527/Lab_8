@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using WinFormApp.DTO;
 using WinFormApp.Forms;
 
@@ -162,6 +161,7 @@ namespace Lab_8.Services
                 }
 
                 existingUser.Name = user.Name;
+                existingUser.RoleId = user.RoleId;
 
                 if (user.Image != null)
                     existingUser.Image = user.Image;

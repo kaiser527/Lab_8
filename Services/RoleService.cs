@@ -99,7 +99,7 @@ namespace Lab_8.Services
                     return;
                 }
 
-                bool isExist = await context.Roles.AnyAsync(f => f.Name == role.Name && f.Id != role.Id);
+                bool isExist = await context.Roles.AnyAsync(r => r.Name == role.Name && r.Id != role.Id);
 
                 if (isExist)
                 {
@@ -152,8 +152,6 @@ namespace Lab_8.Services
                 context.Roles.Remove(role);
 
                 await context.SaveChangesAsync();
-
-                Alert.ShowAlert("Role deleted successfully", Alert.AlertType.Success);
             }
         }
     }

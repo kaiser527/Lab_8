@@ -31,9 +31,7 @@ namespace Lab_8.Services
         {
             using (var context = new QuizDBContext())
             {
-                var query = context.Categories
-                    .Where(c => c.IsActive) 
-                    .AsQueryable();
+                var query = context.Categories.AsQueryable();
 
                 if (!string.IsNullOrEmpty(name))
                 {
@@ -90,7 +88,7 @@ namespace Lab_8.Services
                 }
 
                 bool isExist = await context.Categories
-                    .AnyAsync(c => c.Name == category.Name && c.Id != c.Id);
+                    .AnyAsync(c => c.Name == category.Name && c.Id != category.Id);
 
                 if (isExist)
                 {

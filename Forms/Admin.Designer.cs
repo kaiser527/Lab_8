@@ -65,6 +65,7 @@
             this.tpUser = new System.Windows.Forms.TabPage();
             this.userPaginatePanel = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.btnViewHistory = new System.Windows.Forms.Button();
             this.userRolePanel = new System.Windows.Forms.Panel();
             this.cbUserRole = new System.Windows.Forms.ComboBox();
             this.label10 = new System.Windows.Forms.Label();
@@ -111,6 +112,39 @@
             this.txbRoleName = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
             this.tpPermission = new System.Windows.Forms.TabPage();
+            this.tablePermissionPanel = new System.Windows.Forms.Panel();
+            this.dtgvPermission = new System.Windows.Forms.DataGridView();
+            this.permissionPaginatePanel = new System.Windows.Forms.Panel();
+            this.panel4 = new System.Windows.Forms.Panel();
+            this.permissionModulePanel = new System.Windows.Forms.Panel();
+            this.cbPermissionModule = new System.Windows.Forms.ComboBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.txbSearchPermission = new System.Windows.Forms.TextBox();
+            this.btnCancelPermission = new System.Windows.Forms.Button();
+            this.btnSavePermission = new System.Windows.Forms.Button();
+            this.btnDeletePermission = new System.Windows.Forms.Button();
+            this.btnEditPermission = new System.Windows.Forms.Button();
+            this.btnAddPermission = new System.Windows.Forms.Button();
+            this.permissionNamePanel = new System.Windows.Forms.Panel();
+            this.txbPermissionName = new System.Windows.Forms.TextBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.tpCategory = new System.Windows.Forms.TabPage();
+            this.tableCategory = new System.Windows.Forms.Panel();
+            this.dtgvCategory = new System.Windows.Forms.DataGridView();
+            this.categoryPaginatePanel = new System.Windows.Forms.Panel();
+            this.panel5 = new System.Windows.Forms.Panel();
+            this.categoryIsActivePanel = new System.Windows.Forms.Panel();
+            this.cbCategoryIsActive = new System.Windows.Forms.ComboBox();
+            this.label16 = new System.Windows.Forms.Label();
+            this.txbSearchCategory = new System.Windows.Forms.TextBox();
+            this.btnCancelCategory = new System.Windows.Forms.Button();
+            this.btnSaveCategory = new System.Windows.Forms.Button();
+            this.btnDeleteCategory = new System.Windows.Forms.Button();
+            this.btnEditCategory = new System.Windows.Forms.Button();
+            this.btnAddCategory = new System.Windows.Forms.Button();
+            this.categoryNamePanel = new System.Windows.Forms.Panel();
+            this.txbCategoryName = new System.Windows.Forms.TextBox();
+            this.label17 = new System.Windows.Forms.Label();
             this.tpQuestionAnswer.SuspendLayout();
             this.panel7.SuspendLayout();
             this.listQuizPanel.SuspendLayout();
@@ -141,6 +175,18 @@
             this.panel2.SuspendLayout();
             this.roleIsActivePanel.SuspendLayout();
             this.roleNamePanel.SuspendLayout();
+            this.tpPermission.SuspendLayout();
+            this.tablePermissionPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dtgvPermission)).BeginInit();
+            this.panel4.SuspendLayout();
+            this.permissionModulePanel.SuspendLayout();
+            this.permissionNamePanel.SuspendLayout();
+            this.tpCategory.SuspendLayout();
+            this.tableCategory.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dtgvCategory)).BeginInit();
+            this.panel5.SuspendLayout();
+            this.categoryIsActivePanel.SuspendLayout();
+            this.categoryNamePanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // userFileDialog
@@ -507,6 +553,7 @@
             // 
             // panel3
             // 
+            this.panel3.Controls.Add(this.btnViewHistory);
             this.panel3.Controls.Add(this.userRolePanel);
             this.panel3.Controls.Add(this.txbSearchUser);
             this.panel3.Controls.Add(this.btnCancelUser);
@@ -522,6 +569,16 @@
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(1082, 241);
             this.panel3.TabIndex = 2;
+            // 
+            // btnViewHistory
+            // 
+            this.btnViewHistory.BackColor = System.Drawing.Color.LightGray;
+            this.btnViewHistory.Location = new System.Drawing.Point(551, 140);
+            this.btnViewHistory.Name = "btnViewHistory";
+            this.btnViewHistory.Size = new System.Drawing.Size(142, 41);
+            this.btnViewHistory.TabIndex = 8;
+            this.btnViewHistory.Text = "History";
+            this.btnViewHistory.UseVisualStyleBackColor = false;
             // 
             // userRolePanel
             // 
@@ -769,6 +826,7 @@
             this.tcAdmin.Controls.Add(this.tpQuestionAnswer);
             this.tcAdmin.Controls.Add(this.tpRole);
             this.tcAdmin.Controls.Add(this.tpPermission);
+            this.tcAdmin.Controls.Add(this.tpCategory);
             this.tcAdmin.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tcAdmin.Location = new System.Drawing.Point(13, 13);
             this.tcAdmin.Name = "tcAdmin";
@@ -985,12 +1043,359 @@
             // 
             // tpPermission
             // 
+            this.tpPermission.Controls.Add(this.tablePermissionPanel);
+            this.tpPermission.Controls.Add(this.permissionPaginatePanel);
+            this.tpPermission.Controls.Add(this.panel4);
             this.tpPermission.Location = new System.Drawing.Point(4, 31);
             this.tpPermission.Name = "tpPermission";
             this.tpPermission.Size = new System.Drawing.Size(1094, 615);
             this.tpPermission.TabIndex = 4;
             this.tpPermission.Text = "Permission";
             this.tpPermission.UseVisualStyleBackColor = true;
+            // 
+            // tablePermissionPanel
+            // 
+            this.tablePermissionPanel.BackColor = System.Drawing.Color.White;
+            this.tablePermissionPanel.Controls.Add(this.dtgvPermission);
+            this.tablePermissionPanel.Location = new System.Drawing.Point(6, 197);
+            this.tablePermissionPanel.Name = "tablePermissionPanel";
+            this.tablePermissionPanel.Size = new System.Drawing.Size(1081, 336);
+            this.tablePermissionPanel.TabIndex = 8;
+            // 
+            // dtgvPermission
+            // 
+            this.dtgvPermission.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dtgvPermission.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dtgvPermission.Location = new System.Drawing.Point(12, 12);
+            this.dtgvPermission.Name = "dtgvPermission";
+            this.dtgvPermission.RowHeadersWidth = 51;
+            this.dtgvPermission.RowTemplate.Height = 24;
+            this.dtgvPermission.Size = new System.Drawing.Size(1058, 312);
+            this.dtgvPermission.TabIndex = 0;
+            this.dtgvPermission.SelectionChanged += new System.EventHandler(this.dtgvPermission_SelectionChanged);
+            // 
+            // permissionPaginatePanel
+            // 
+            this.permissionPaginatePanel.BackColor = System.Drawing.Color.White;
+            this.permissionPaginatePanel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.permissionPaginatePanel.Location = new System.Drawing.Point(6, 539);
+            this.permissionPaginatePanel.Name = "permissionPaginatePanel";
+            this.permissionPaginatePanel.Size = new System.Drawing.Size(1081, 70);
+            this.permissionPaginatePanel.TabIndex = 7;
+            // 
+            // panel4
+            // 
+            this.panel4.Controls.Add(this.permissionModulePanel);
+            this.panel4.Controls.Add(this.txbSearchPermission);
+            this.panel4.Controls.Add(this.btnCancelPermission);
+            this.panel4.Controls.Add(this.btnSavePermission);
+            this.panel4.Controls.Add(this.btnDeletePermission);
+            this.panel4.Controls.Add(this.btnEditPermission);
+            this.panel4.Controls.Add(this.btnAddPermission);
+            this.panel4.Controls.Add(this.permissionNamePanel);
+            this.panel4.Location = new System.Drawing.Point(6, 6);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(1081, 185);
+            this.panel4.TabIndex = 4;
+            // 
+            // permissionModulePanel
+            // 
+            this.permissionModulePanel.BackColor = System.Drawing.Color.White;
+            this.permissionModulePanel.Controls.Add(this.cbPermissionModule);
+            this.permissionModulePanel.Controls.Add(this.label13);
+            this.permissionModulePanel.ForeColor = System.Drawing.Color.Black;
+            this.permissionModulePanel.Location = new System.Drawing.Point(92, 72);
+            this.permissionModulePanel.Name = "permissionModulePanel";
+            this.permissionModulePanel.Size = new System.Drawing.Size(441, 55);
+            this.permissionModulePanel.TabIndex = 3;
+            // 
+            // cbPermissionModule
+            // 
+            this.cbPermissionModule.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbPermissionModule.FormattingEnabled = true;
+            this.cbPermissionModule.Location = new System.Drawing.Point(124, 13);
+            this.cbPermissionModule.Name = "cbPermissionModule";
+            this.cbPermissionModule.Size = new System.Drawing.Size(299, 28);
+            this.cbPermissionModule.TabIndex = 1;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(13, 16);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(73, 22);
+            this.label13.TabIndex = 0;
+            this.label13.Text = "Module:";
+            // 
+            // txbSearchPermission
+            // 
+            this.txbSearchPermission.Location = new System.Drawing.Point(551, 139);
+            this.txbSearchPermission.Name = "txbSearchPermission";
+            this.txbSearchPermission.Size = new System.Drawing.Size(145, 28);
+            this.txbSearchPermission.TabIndex = 6;
+            this.txbSearchPermission.TextChanged += new System.EventHandler(this.txbSearchPermission_TextChanged);
+            // 
+            // btnCancelPermission
+            // 
+            this.btnCancelPermission.BackColor = System.Drawing.Color.LightGray;
+            this.btnCancelPermission.Enabled = false;
+            this.btnCancelPermission.Location = new System.Drawing.Point(850, 133);
+            this.btnCancelPermission.Name = "btnCancelPermission";
+            this.btnCancelPermission.Size = new System.Drawing.Size(142, 41);
+            this.btnCancelPermission.TabIndex = 5;
+            this.btnCancelPermission.Text = "Cancel";
+            this.btnCancelPermission.UseVisualStyleBackColor = false;
+            this.btnCancelPermission.Click += new System.EventHandler(this.btnCancelPermission_Click);
+            // 
+            // btnSavePermission
+            // 
+            this.btnSavePermission.BackColor = System.Drawing.Color.LightGray;
+            this.btnSavePermission.Enabled = false;
+            this.btnSavePermission.Location = new System.Drawing.Point(702, 133);
+            this.btnSavePermission.Name = "btnSavePermission";
+            this.btnSavePermission.Size = new System.Drawing.Size(142, 41);
+            this.btnSavePermission.TabIndex = 5;
+            this.btnSavePermission.Text = "Save";
+            this.btnSavePermission.UseVisualStyleBackColor = false;
+            this.btnSavePermission.Click += new System.EventHandler(this.btnSavePermission_Click);
+            // 
+            // btnDeletePermission
+            // 
+            this.btnDeletePermission.BackColor = System.Drawing.Color.LightGray;
+            this.btnDeletePermission.Location = new System.Drawing.Point(388, 133);
+            this.btnDeletePermission.Name = "btnDeletePermission";
+            this.btnDeletePermission.Size = new System.Drawing.Size(142, 41);
+            this.btnDeletePermission.TabIndex = 5;
+            this.btnDeletePermission.Text = "Delete";
+            this.btnDeletePermission.UseVisualStyleBackColor = false;
+            this.btnDeletePermission.Click += new System.EventHandler(this.btnDeletePermission_Click);
+            // 
+            // btnEditPermission
+            // 
+            this.btnEditPermission.BackColor = System.Drawing.Color.LightGray;
+            this.btnEditPermission.Location = new System.Drawing.Point(240, 133);
+            this.btnEditPermission.Name = "btnEditPermission";
+            this.btnEditPermission.Size = new System.Drawing.Size(142, 41);
+            this.btnEditPermission.TabIndex = 4;
+            this.btnEditPermission.Text = "Edit";
+            this.btnEditPermission.UseVisualStyleBackColor = false;
+            this.btnEditPermission.Click += new System.EventHandler(this.btnEditPermission_Click);
+            // 
+            // btnAddPermission
+            // 
+            this.btnAddPermission.BackColor = System.Drawing.Color.LightGray;
+            this.btnAddPermission.Location = new System.Drawing.Point(92, 133);
+            this.btnAddPermission.Name = "btnAddPermission";
+            this.btnAddPermission.Size = new System.Drawing.Size(142, 41);
+            this.btnAddPermission.TabIndex = 2;
+            this.btnAddPermission.Text = "Add";
+            this.btnAddPermission.UseVisualStyleBackColor = false;
+            this.btnAddPermission.Click += new System.EventHandler(this.btnAddPermission_Click);
+            // 
+            // permissionNamePanel
+            // 
+            this.permissionNamePanel.BackColor = System.Drawing.Color.White;
+            this.permissionNamePanel.Controls.Add(this.txbPermissionName);
+            this.permissionNamePanel.Controls.Add(this.label18);
+            this.permissionNamePanel.ForeColor = System.Drawing.Color.Black;
+            this.permissionNamePanel.Location = new System.Drawing.Point(92, 11);
+            this.permissionNamePanel.Name = "permissionNamePanel";
+            this.permissionNamePanel.Size = new System.Drawing.Size(441, 55);
+            this.permissionNamePanel.TabIndex = 0;
+            // 
+            // txbPermissionName
+            // 
+            this.txbPermissionName.Location = new System.Drawing.Point(124, 13);
+            this.txbPermissionName.Name = "txbPermissionName";
+            this.txbPermissionName.Size = new System.Drawing.Size(299, 28);
+            this.txbPermissionName.TabIndex = 1;
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(13, 16);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(62, 22);
+            this.label18.TabIndex = 0;
+            this.label18.Text = "Name:";
+            // 
+            // tpCategory
+            // 
+            this.tpCategory.Controls.Add(this.tableCategory);
+            this.tpCategory.Controls.Add(this.categoryPaginatePanel);
+            this.tpCategory.Controls.Add(this.panel5);
+            this.tpCategory.Location = new System.Drawing.Point(4, 31);
+            this.tpCategory.Name = "tpCategory";
+            this.tpCategory.Size = new System.Drawing.Size(1094, 615);
+            this.tpCategory.TabIndex = 5;
+            this.tpCategory.Text = "Category";
+            this.tpCategory.UseVisualStyleBackColor = true;
+            // 
+            // tableCategory
+            // 
+            this.tableCategory.BackColor = System.Drawing.Color.White;
+            this.tableCategory.Controls.Add(this.dtgvCategory);
+            this.tableCategory.Location = new System.Drawing.Point(6, 197);
+            this.tableCategory.Name = "tableCategory";
+            this.tableCategory.Size = new System.Drawing.Size(1081, 336);
+            this.tableCategory.TabIndex = 9;
+            // 
+            // dtgvCategory
+            // 
+            this.dtgvCategory.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dtgvCategory.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dtgvCategory.Location = new System.Drawing.Point(12, 12);
+            this.dtgvCategory.Name = "dtgvCategory";
+            this.dtgvCategory.RowHeadersWidth = 51;
+            this.dtgvCategory.RowTemplate.Height = 24;
+            this.dtgvCategory.Size = new System.Drawing.Size(1058, 312);
+            this.dtgvCategory.TabIndex = 0;
+            this.dtgvCategory.SelectionChanged += new System.EventHandler(this.dtgvCategory_SelectionChanged);
+            // 
+            // categoryPaginatePanel
+            // 
+            this.categoryPaginatePanel.BackColor = System.Drawing.Color.White;
+            this.categoryPaginatePanel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.categoryPaginatePanel.Location = new System.Drawing.Point(6, 539);
+            this.categoryPaginatePanel.Name = "categoryPaginatePanel";
+            this.categoryPaginatePanel.Size = new System.Drawing.Size(1081, 70);
+            this.categoryPaginatePanel.TabIndex = 8;
+            // 
+            // panel5
+            // 
+            this.panel5.Controls.Add(this.categoryIsActivePanel);
+            this.panel5.Controls.Add(this.txbSearchCategory);
+            this.panel5.Controls.Add(this.btnCancelCategory);
+            this.panel5.Controls.Add(this.btnSaveCategory);
+            this.panel5.Controls.Add(this.btnDeleteCategory);
+            this.panel5.Controls.Add(this.btnEditCategory);
+            this.panel5.Controls.Add(this.btnAddCategory);
+            this.panel5.Controls.Add(this.categoryNamePanel);
+            this.panel5.Location = new System.Drawing.Point(6, 6);
+            this.panel5.Name = "panel5";
+            this.panel5.Size = new System.Drawing.Size(1081, 185);
+            this.panel5.TabIndex = 5;
+            // 
+            // categoryIsActivePanel
+            // 
+            this.categoryIsActivePanel.BackColor = System.Drawing.Color.White;
+            this.categoryIsActivePanel.Controls.Add(this.cbCategoryIsActive);
+            this.categoryIsActivePanel.Controls.Add(this.label16);
+            this.categoryIsActivePanel.ForeColor = System.Drawing.Color.Black;
+            this.categoryIsActivePanel.Location = new System.Drawing.Point(92, 72);
+            this.categoryIsActivePanel.Name = "categoryIsActivePanel";
+            this.categoryIsActivePanel.Size = new System.Drawing.Size(441, 55);
+            this.categoryIsActivePanel.TabIndex = 7;
+            // 
+            // cbCategoryIsActive
+            // 
+            this.cbCategoryIsActive.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbCategoryIsActive.FormattingEnabled = true;
+            this.cbCategoryIsActive.Location = new System.Drawing.Point(124, 13);
+            this.cbCategoryIsActive.Name = "cbCategoryIsActive";
+            this.cbCategoryIsActive.Size = new System.Drawing.Size(299, 28);
+            this.cbCategoryIsActive.TabIndex = 1;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(13, 16);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(82, 22);
+            this.label16.TabIndex = 0;
+            this.label16.Text = "Is Active:";
+            // 
+            // txbSearchCategory
+            // 
+            this.txbSearchCategory.Location = new System.Drawing.Point(551, 139);
+            this.txbSearchCategory.Name = "txbSearchCategory";
+            this.txbSearchCategory.Size = new System.Drawing.Size(145, 28);
+            this.txbSearchCategory.TabIndex = 6;
+            this.txbSearchCategory.TextChanged += new System.EventHandler(this.txbSearchCategory_TextChanged);
+            // 
+            // btnCancelCategory
+            // 
+            this.btnCancelCategory.BackColor = System.Drawing.Color.LightGray;
+            this.btnCancelCategory.Enabled = false;
+            this.btnCancelCategory.Location = new System.Drawing.Point(850, 133);
+            this.btnCancelCategory.Name = "btnCancelCategory";
+            this.btnCancelCategory.Size = new System.Drawing.Size(142, 41);
+            this.btnCancelCategory.TabIndex = 5;
+            this.btnCancelCategory.Text = "Cancel";
+            this.btnCancelCategory.UseVisualStyleBackColor = false;
+            this.btnCancelCategory.Click += new System.EventHandler(this.btnCancelCategory_Click);
+            // 
+            // btnSaveCategory
+            // 
+            this.btnSaveCategory.BackColor = System.Drawing.Color.LightGray;
+            this.btnSaveCategory.Enabled = false;
+            this.btnSaveCategory.Location = new System.Drawing.Point(702, 133);
+            this.btnSaveCategory.Name = "btnSaveCategory";
+            this.btnSaveCategory.Size = new System.Drawing.Size(142, 41);
+            this.btnSaveCategory.TabIndex = 5;
+            this.btnSaveCategory.Text = "Save";
+            this.btnSaveCategory.UseVisualStyleBackColor = false;
+            this.btnSaveCategory.Click += new System.EventHandler(this.btnSaveCategory_Click);
+            // 
+            // btnDeleteCategory
+            // 
+            this.btnDeleteCategory.BackColor = System.Drawing.Color.LightGray;
+            this.btnDeleteCategory.Location = new System.Drawing.Point(388, 133);
+            this.btnDeleteCategory.Name = "btnDeleteCategory";
+            this.btnDeleteCategory.Size = new System.Drawing.Size(142, 41);
+            this.btnDeleteCategory.TabIndex = 5;
+            this.btnDeleteCategory.Text = "Delete";
+            this.btnDeleteCategory.UseVisualStyleBackColor = false;
+            this.btnDeleteCategory.Click += new System.EventHandler(this.btnDeleteCategory_Click);
+            // 
+            // btnEditCategory
+            // 
+            this.btnEditCategory.BackColor = System.Drawing.Color.LightGray;
+            this.btnEditCategory.Location = new System.Drawing.Point(240, 133);
+            this.btnEditCategory.Name = "btnEditCategory";
+            this.btnEditCategory.Size = new System.Drawing.Size(142, 41);
+            this.btnEditCategory.TabIndex = 4;
+            this.btnEditCategory.Text = "Edit";
+            this.btnEditCategory.UseVisualStyleBackColor = false;
+            this.btnEditCategory.Click += new System.EventHandler(this.btnEditCategory_Click);
+            // 
+            // btnAddCategory
+            // 
+            this.btnAddCategory.BackColor = System.Drawing.Color.LightGray;
+            this.btnAddCategory.Location = new System.Drawing.Point(92, 133);
+            this.btnAddCategory.Name = "btnAddCategory";
+            this.btnAddCategory.Size = new System.Drawing.Size(142, 41);
+            this.btnAddCategory.TabIndex = 2;
+            this.btnAddCategory.Text = "Add";
+            this.btnAddCategory.UseVisualStyleBackColor = false;
+            this.btnAddCategory.Click += new System.EventHandler(this.btnAddCategory_Click);
+            // 
+            // categoryNamePanel
+            // 
+            this.categoryNamePanel.BackColor = System.Drawing.Color.White;
+            this.categoryNamePanel.Controls.Add(this.txbCategoryName);
+            this.categoryNamePanel.Controls.Add(this.label17);
+            this.categoryNamePanel.ForeColor = System.Drawing.Color.Black;
+            this.categoryNamePanel.Location = new System.Drawing.Point(92, 11);
+            this.categoryNamePanel.Name = "categoryNamePanel";
+            this.categoryNamePanel.Size = new System.Drawing.Size(441, 55);
+            this.categoryNamePanel.TabIndex = 0;
+            // 
+            // txbCategoryName
+            // 
+            this.txbCategoryName.Location = new System.Drawing.Point(124, 13);
+            this.txbCategoryName.Name = "txbCategoryName";
+            this.txbCategoryName.Size = new System.Drawing.Size(299, 28);
+            this.txbCategoryName.TabIndex = 1;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(13, 16);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(62, 22);
+            this.label17.TabIndex = 0;
+            this.label17.Text = "Name:";
             // 
             // Admin
             // 
@@ -1050,6 +1455,24 @@
             this.roleIsActivePanel.PerformLayout();
             this.roleNamePanel.ResumeLayout(false);
             this.roleNamePanel.PerformLayout();
+            this.tpPermission.ResumeLayout(false);
+            this.tablePermissionPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dtgvPermission)).EndInit();
+            this.panel4.ResumeLayout(false);
+            this.panel4.PerformLayout();
+            this.permissionModulePanel.ResumeLayout(false);
+            this.permissionModulePanel.PerformLayout();
+            this.permissionNamePanel.ResumeLayout(false);
+            this.permissionNamePanel.PerformLayout();
+            this.tpCategory.ResumeLayout(false);
+            this.tableCategory.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dtgvCategory)).EndInit();
+            this.panel5.ResumeLayout(false);
+            this.panel5.PerformLayout();
+            this.categoryIsActivePanel.ResumeLayout(false);
+            this.categoryIsActivePanel.PerformLayout();
+            this.categoryNamePanel.ResumeLayout(false);
+            this.categoryNamePanel.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1138,5 +1561,39 @@
         private System.Windows.Forms.DataGridView dtgvRole;
         private System.Windows.Forms.Panel moduleListPanel;
         private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.Panel permissionModulePanel;
+        private System.Windows.Forms.ComboBox cbPermissionModule;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.TextBox txbSearchPermission;
+        private System.Windows.Forms.Button btnCancelPermission;
+        private System.Windows.Forms.Button btnSavePermission;
+        private System.Windows.Forms.Button btnDeletePermission;
+        private System.Windows.Forms.Button btnEditPermission;
+        private System.Windows.Forms.Button btnAddPermission;
+        private System.Windows.Forms.Panel permissionNamePanel;
+        private System.Windows.Forms.TextBox txbPermissionName;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Panel permissionPaginatePanel;
+        private System.Windows.Forms.Panel tablePermissionPanel;
+        private System.Windows.Forms.DataGridView dtgvPermission;
+        private System.Windows.Forms.TabPage tpCategory;
+        private System.Windows.Forms.Button btnViewHistory;
+        private System.Windows.Forms.Panel panel5;
+        private System.Windows.Forms.TextBox txbSearchCategory;
+        private System.Windows.Forms.Button btnCancelCategory;
+        private System.Windows.Forms.Button btnSaveCategory;
+        private System.Windows.Forms.Button btnDeleteCategory;
+        private System.Windows.Forms.Button btnEditCategory;
+        private System.Windows.Forms.Button btnAddCategory;
+        private System.Windows.Forms.Panel categoryNamePanel;
+        private System.Windows.Forms.TextBox txbCategoryName;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.Panel categoryPaginatePanel;
+        private System.Windows.Forms.Panel tableCategory;
+        private System.Windows.Forms.DataGridView dtgvCategory;
+        private System.Windows.Forms.Panel categoryIsActivePanel;
+        private System.Windows.Forms.ComboBox cbCategoryIsActive;
+        private System.Windows.Forms.Label label16;
     }
 }

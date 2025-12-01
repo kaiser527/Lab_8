@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -28,6 +29,11 @@ namespace Lab_8.Models
 
         [ForeignKey("RoleId")]
         public Role Role { get; set; }
+
+        [MaxLength(6)]
+        public string CodeId { get; set; }
+
+        public DateTime CodeExpire { get; set; }
 
         public ICollection<History> Histories { get; set; } = new List<History>();
 

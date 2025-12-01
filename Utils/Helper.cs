@@ -1,5 +1,6 @@
 ﻿using Lab_8.Models;
 using NAudio.Wave;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -9,6 +10,45 @@ namespace Lab_8.Utils
     {
         private static Question currentPlayingQuestion;
         private static Button currentPlayPauseButton;
+
+        private static Timer shimmerTimer;
+        private static int shimmerOffset = 0;
+
+        public static void StartShimmerAnimation(FlowLayoutPanel container)
+        {
+            shimmerTimer = new Timer
+            {
+                Interval = 50 // adjust speed
+            };
+            shimmerTimer.Tick += (s, e) =>
+            {
+                shimmerOffset += 5;
+
+                foreach (Control card in container.Controls)
+                {
+                    foreach (Control placeholder in card.Controls)
+                    {
+                        if (placeholder is Panel)
+                        {
+                            int baseColor = 200;
+                            int offset = (shimmerOffset + placeholder.Top) % 255;
+                            placeholder.BackColor = Color.FromArgb(
+                                baseColor + offset / 2 % 55,
+                                baseColor + offset / 2 % 55,
+                                baseColor + offset / 2 % 55
+                            );
+                        }
+                    }
+                }
+            };
+            shimmerTimer.Start();
+        }
+
+        public static void StopShimmerAnimation()
+        {
+            shimmerTimer?.Stop();
+            shimmerTimer = null;
+        }
 
         public static byte[] UploadImage(OpenFileDialog openFileDialog, PictureBox pictureBox = null)
         {
@@ -20,7 +60,7 @@ namespace Lab_8.Utils
                 string filePath = openFileDialog.FileName;
 
                 if (pictureBox != null)
-                    pictureBox.Image = System.Drawing.Image.FromFile(filePath);
+                    pictureBox.Image = Image.FromFile(filePath);
 
                 return File.ReadAllBytes(filePath);
             }
@@ -36,7 +76,7 @@ namespace Lab_8.Utils
             {
                 StopAudio(currentPlayingQuestion);
                 if (currentPlayPauseButton != null)
-                    currentPlayPauseButton.Text = "Play";
+                    currentPlayPauseButton.Text = "▶";
             }
 
             // Start or resume current audio
@@ -67,7 +107,7 @@ namespace Lab_8.Utils
                     if (currentPlayPauseButton == btnPlayPause)
                         currentPlayPauseButton = null;
 
-                    btnPlayPause.Text = "Play";
+                    btnPlayPause.Text = "▶";
                 };
             }
         }

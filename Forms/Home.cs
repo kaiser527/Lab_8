@@ -2,6 +2,7 @@
 using Lab_8.Services;
 using Lab_8.Utils;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -44,17 +45,17 @@ namespace Lab_8.Forms
             var permissionNames = role.RolePermissions
                 .Select(rp => rp.Permission.Name)
                 .ToList();
-
-            if (!permissionNames.Contains("View Quiz"))
-            {
-                flpQuiz.Controls.Clear();
-            }
         }
         public async Task LoadQuiz()
         {
-            flpQuiz.Controls.Clear();
+            ShowQuizSkeletonLoader(_pageSizeQuiz);
 
             var result = await QuizService.Instance.GetListQuiz(_pageSizeQuiz, _currentPageQuiz, null);
+
+            Helper.StopShimmerAnimation();
+
+            flpQuiz.Controls.Clear();
+
             if (result == null || !result.Items.Any()) return;
 
             _totalPagesQuiz = result.TotalPages;
@@ -87,9 +88,23 @@ namespace Lab_8.Forms
 
         public async Task<int> ShowHistoryAsync(int quizId)
         {
-            historyPanel.Controls.Clear();
-
             var user = UserService.Instance.User;
+
+            ShowHistorySkeleton(_pageSizeHistory);
+
+            // --- Fetch filtered history ---
+            var result = await HistoryService.Instance.GetListHistoryByQuizIdAndUserId(
+                quizId,
+                user.Id,
+                _pageSizeHistory,
+                _currentPageHistory,
+                _timeStart,
+                _timeFinish
+            );
+
+            Helper.StopShimmerAnimation();
+
+            historyPanel.Controls.Clear();
 
             // Title
             Label lblTitle = new Label
@@ -198,15 +213,6 @@ namespace Lab_8.Forms
             resetPanel.Controls.Add(btnReset);
             flow.Controls.Add(resetPanel);
 
-            // --- Fetch filtered history ---
-            var result = await HistoryService.Instance.GetListHistoryByQuizIdAndUserId(
-                quizId,
-                user.Id,
-                _pageSizeHistory,
-                _currentPageHistory,
-                _timeStart,
-                _timeFinish
-            );
 
             // --- Empty state ---
             if (result.Items == null || !result.Items.Any())
@@ -534,19 +540,158 @@ namespace Lab_8.Forms
                 }
             );
         }
+
+        private void ShowHistorySkeleton(int count = 5)
+        {
+            historyPanel.Controls.Clear();
+
+            // Title
+            Label lblTitle = new Label
+            {
+                Text = "Quiz History",
+                Dock = DockStyle.Top,
+                Height = 40,
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.FromArgb(0, 120, 215)
+            };
+            historyPanel.Controls.Add(lblTitle);
+
+            // Flow container
+            FlowLayoutPanel flow = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = true,
+                FlowDirection = FlowDirection.TopDown,
+                WrapContents = false,
+                Padding = new Padding(15, 45, 15, 15),
+                BackColor = Color.WhiteSmoke
+            };
+            historyPanel.Controls.Add(flow);
+
+            // Skeleton rows
+            for (int i = 0; i < count; i++)
+            {
+                Panel skel = new Panel
+                {
+                    Width = flow.ClientSize.Width - 40,
+                    Height = 70,
+                    BackColor = Color.Gainsboro,
+                    Margin = new Padding(5)
+                };
+
+                Panel line1 = new Panel
+                {
+                    Width = skel.Width - 40,
+                    Height = 15,
+                    Top = 10,
+                    Left = 20,
+                    BackColor = Color.LightGray
+                };
+
+                Panel line2 = new Panel
+                {
+                    Width = skel.Width - 100,
+                    Height = 15,
+                    Top = 40,
+                    Left = 20,
+                    BackColor = Color.LightGray
+                };
+
+                skel.Controls.Add(line1);
+                skel.Controls.Add(line2);
+                flow.Controls.Add(skel);
+            }
+
+            // Start shimmer effect (reuse same method)
+            Helper.StartShimmerAnimation(flow);
+        }
+
+        private void ShowQuizSkeletonLoader(int count = 6)
+        {
+            flpQuiz.Controls.Clear();
+
+            for (int i = 0; i < count; i++)
+            {
+                Panel skeletonCard = new Panel
+                {
+                    Width = 180,
+                    Height = 240,
+                    BorderStyle = BorderStyle.FixedSingle,
+                    BackColor = Color.Gainsboro,
+                    Margin = new Padding(8)
+                };
+
+                // Image placeholder
+                Panel imgPlaceholder = new Panel
+                {
+                    Width = 160,
+                    Height = 110,
+                    Top = 8,
+                    Left = 10,
+                    BackColor = Color.LightGray
+                };
+                skeletonCard.Controls.Add(imgPlaceholder);
+
+                // Name placeholder
+                Panel namePlaceholder = new Panel
+                {
+                    Width = 160,
+                    Height = 20,
+                    Top = 125,
+                    Left = 10,
+                    BackColor = Color.LightGray
+                };
+                skeletonCard.Controls.Add(namePlaceholder);
+
+                // Difficulty placeholder
+                Panel diffPlaceholder = new Panel
+                {
+                    Width = 160,
+                    Height = 20,
+                    Top = 160,
+                    Left = 10,
+                    BackColor = Color.LightGray
+                };
+                skeletonCard.Controls.Add(diffPlaceholder);
+
+                // Button placeholder
+                Panel btnPlaceholder = new Panel
+                {
+                    Width = 140,
+                    Height = 30,
+                    Top = 192,
+                    Left = 20,
+                    BackColor = Color.Gray
+                };
+                skeletonCard.Controls.Add(btnPlaceholder);
+
+                flpQuiz.Controls.Add(skeletonCard);
+            }
+
+            // Optional: start shimmer animation
+            Helper.StartShimmerAnimation(flpQuiz);
+        }
         #endregion
 
         #region Events
         private async void load_Data(object sender, EventArgs e)
         {
-            var quizTask = LoadQuiz();
-            var historyTask = RenderHistoryPagination(await HistoryService.Instance.GetFirstHistoryId());
-
-            await Task.WhenAll(quizTask, historyTask);
-
             var user = UserService.Instance.User;
             toolStripBtnDropdown.Text = user.Name;
+
+            var role = user.Role;
+            var permissionNames = role?.RolePermissions.Select(rp => rp.Permission.Name).ToList() ?? new List<string>();
+
+            if (permissionNames.Contains("View Quiz"))
+            {
+                await LoadQuiz();
+            }
+
+            var firstHistoryId = await HistoryService.Instance.GetFirstHistoryId();
+            await RenderHistoryPagination(firstHistoryId);
         }
+
 
         private void toolStripAdminBtn_Click(object sender, EventArgs e)
         {

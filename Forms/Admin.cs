@@ -23,11 +23,15 @@ namespace Lab_8.Forms
         private readonly BindingSource userlist = new BindingSource();
         private readonly BindingSource quizlist = new BindingSource();
         private readonly BindingSource rolelist = new BindingSource();
+        private readonly BindingSource permissionlist = new BindingSource();
+        private readonly BindingSource categorylist = new BindingSource();
 
         //Placeholder
         private readonly bool _isPlaceholderUserApplied = false;
         private readonly bool _isPlaceholderQuizApplied = false;
         private readonly bool _isPlaceholderRoleApplied = false;
+        private readonly bool _isPlaceholderPermissionApplied = false;
+        private readonly bool _isPlaceholderCategoryApplied = false;
 
         //Paginate
         private readonly int _pageSize = 10;
@@ -40,6 +44,12 @@ namespace Lab_8.Forms
         //Role
         private int _currentPageRole = 1;
         private int _totalPagesRole = 1;
+        //Permission
+        private int _currentPagePermission = 1;
+        private int _totalPagesPermission = 1;
+        //Category
+        private int _currentPageCategory = 1;
+        private int _totalPagesCategory = 1;
 
         //User property
         private string userAction = null;
@@ -49,6 +59,7 @@ namespace Lab_8.Forms
         //Upsert Quiz-QA
         private List<Question> questionList = new List<Question>();
         private int selectedQuizId = 0;
+        private Question currentQuestion;
 
         //Quiz property
         private string quizAction = null;
@@ -60,6 +71,14 @@ namespace Lab_8.Forms
         private Role _selectedRole;
         private string roleAction = null;
 
+        //Permission property
+        private int _selectedPermissionId = 0;
+        private string permissionAction = null;
+
+        //Category property
+        private int _selectedCategoryId = 0;
+        private string categoryAction = null;   
+
         public Admin(Home home  )
         {
             InitializeComponent();
@@ -70,15 +89,24 @@ namespace Lab_8.Forms
             UIStyle.ApplyPlaceholder(txbSearchUser, "Search user", ref _isPlaceholderUserApplied);
             UIStyle.ApplyPlaceholder(txbSearchQuiz, "Search quiz", ref _isPlaceholderQuizApplied);
             UIStyle.ApplyPlaceholder(txbSearchRole, "Search role", ref _isPlaceholderRoleApplied);
+            UIStyle.ApplyPlaceholder(txbSearchCategory, "Search category", ref _isPlaceholderCategoryApplied);
+            UIStyle.ApplyPlaceholder(txbSearchPermission, "Search permission", ref _isPlaceholderPermissionApplied);
 
             Load += LoadData;
             _home = home;
+
+            FormClosing += (s, e) => Helper.StopAudio(currentQuestion);
         }
 
         #region Methods
         private void LoadQuizDifficulty()
         {
             cbQuizDifficulty.DataSource = new string[] { "EASY", "MEDIUM", "HARD" };
+        }
+
+        private void LoadPermissionModule()
+        {
+            cbPermissionModule.DataSource = new string[] { "User", "Permission", "Role", "Quiz", "Question", "Category" };
         }
 
         private void ApplyPermissions()
@@ -122,10 +150,16 @@ namespace Lab_8.Forms
                 { "View Role", () => tcAdmin.TabPages.Remove(tpRole) },
                 { "Create Role", () => btnAddRole.Enabled = false },
                 { "Delete Role", () => btnDeleteRole.Enabled = false },
-                { "Update Role", () => btnEditQuiz.Enabled = false },
+                { "Update Role", () => btnEditRole.Enabled = false },
 
                 //Permission
                 { "View Permission", () => tcAdmin.TabPages.Remove(tpPermission) },
+                { "Create Permission", () => btnAddPermission.Enabled = false },
+                { "Delete Permission", () => btnDeletePermission.Enabled = false },
+                { "Update Permission", () => btnEditPermission.Enabled = false },
+
+                //Category
+                { "View Category", () => tcAdmin.TabPages.Remove(tpCategory) },
             };
 
             foreach (var kvp in permissionActions)
@@ -389,17 +423,11 @@ namespace Lab_8.Forms
                 r.Id,
                 r.Name,
                 IsActive = r.IsActive ? "Active" : "Inactive",
-                Permissions = string.Join(", ", r.RolePermissions.Select(rp => rp.Permission.Name))
             }).ToList();
 
             rolelist.DataSource = rolesWithString;
 
             dtgvRole.DataSource = rolelist;
-
-            if (dtgvRole.Columns.Contains("Permissions"))
-            {
-                dtgvRole.Columns["Permissions"].Visible = false;
-            }
 
             _totalPagesRole = result.TotalPages;
 
@@ -419,21 +447,41 @@ namespace Lab_8.Forms
             BindRoleData();
         }
 
-        private async Task LoadDataIntoCombobox<T>(ComboBox comboBox, Func<Task<PaginatedResult<T>>> dataFetcher)
+        private async Task LoadDataIntoCombobox<T>(
+            ComboBox comboBox,
+            Func<Task<PaginatedResult<T>>> dataFetcher
+        )
         {
             var result = await dataFetcher();
             var items = result?.Items ?? new List<T>();
 
-            if (typeof(T) == typeof(Role))
+            var filtered = new List<T>();
+
+            foreach (var item in items)
             {
-                items = items
-                    .Cast<Role>()        
-                    .Where(r => r.IsActive)
-                    .Cast<T>()            
-                    .ToList();
+                // Case 1: Role → filter IsActive
+                if (item is Role role)
+                {
+                    if (role.IsActive)
+                        filtered.Add(item);
+
+                    continue;
+                }
+
+                // Case 2: Category → filter IsActive
+                if (item is Category category)
+                {
+                    if (category.IsActive)
+                        filtered.Add(item);
+
+                    continue;
+                }
+
+                // Case 3: Other types → no filtering
+                filtered.Add(item);
             }
 
-            comboBox.DataSource = items;
+            comboBox.DataSource = filtered;
             comboBox.DisplayMember = "Name";
             comboBox.ValueMember = "Id";
         }
@@ -441,6 +489,8 @@ namespace Lab_8.Forms
         private async Task LoadQuestionsByQuizId(int quizId)
         {
             selectedQuizId = quizId;
+
+            ShowQuestionListSkeleton(3);
 
             // Fetch from service
             var result = await QuestionService.Instance.GetListQuestionByQuiz(quizId);
@@ -458,6 +508,8 @@ namespace Lab_8.Forms
                     }
                 });
 
+            Helper.StopShimmerAnimation();
+            panel8.Controls.Clear();
             RenderQuestionList();
         }
 
@@ -561,8 +613,14 @@ namespace Lab_8.Forms
 
                         if (dlg.ShowDialog() == DialogResult.OK)
                         {
+                            Helper.StopAudio(q);
+
                             q.Audio = File.ReadAllBytes(dlg.FileName);
-                            RenderQuestionList(); // refresh to show Play/Stop buttons
+
+                            q.Reader = null;
+                            q.WaveOut = null;
+
+                            RenderQuestionList();
                         }
                     }
                 };
@@ -573,7 +631,7 @@ namespace Lab_8.Forms
                 {
                     var btnPlayPause = new Button
                     {
-                        Text = "Play",
+                        Text = "▶",
                         Left = btnUploadAudio.Right + 5,
                         Top = pic.Top,
                         Width = 100,
@@ -582,15 +640,16 @@ namespace Lab_8.Forms
 
                     btnPlayPause.Click += (s, e) =>
                     {
+                        currentQuestion = q;
                         if (q.WaveOut != null && q.WaveOut.PlaybackState == PlaybackState.Playing)
                         {
                             Helper.PauseAudio(q);   
-                            btnPlayPause.Text = "Play";
+                            btnPlayPause.Text = "▶";
                         }
                         else
                         {
                             Helper.PlayAudio(q, btnPlayPause);
-                            btnPlayPause.Text = "Pause";
+                            btnPlayPause.Text = "⏸";
                         }
                     };
                     questionPanel.Controls.Add(btnPlayPause);
@@ -658,6 +717,95 @@ namespace Lab_8.Forms
             }
         }
 
+        private void ShowQuestionListSkeleton(int count = 3)
+        {
+            panel8.Controls.Clear();
+            panel8.AutoScroll = true;
+
+            // Container
+            FlowLayoutPanel flow = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                FlowDirection = FlowDirection.TopDown,
+                AutoScroll = true,
+                WrapContents = false,
+                Padding = new Padding(10)
+            };
+            panel8.Controls.Add(flow);
+
+            for (int i = 0; i < count; i++)
+            {
+                Panel skel = new Panel
+                {
+                    Width = panel8.Width - 40,
+                    Height = 260,
+                    BackColor = Color.WhiteSmoke,
+                    Margin = new Padding(10)
+                };
+
+                // Question bar
+                skel.Controls.Add(new Panel
+                {
+                    Left = 10,
+                    Top = 10,
+                    Width = skel.Width - 40,
+                    Height = 25,
+                    BackColor = Color.Gainsboro
+                });
+
+                // Image placeholder
+                skel.Controls.Add(new Panel
+                {
+                    Left = 10,
+                    Top = 50,
+                    Width = 160,
+                    Height = 100,
+                    BackColor = Color.Gainsboro
+                });
+
+                // Audio button placeholder
+                skel.Controls.Add(new Panel
+                {
+                    Left = 180,
+                    Top = 50,
+                    Width = 100,
+                    Height = 25,
+                    BackColor = Color.LightGray
+                });
+
+                // Answers group box
+                Panel answersBox = new Panel
+                {
+                    Left = 10,
+                    Top = 160,
+                    Width = skel.Width - 40,
+                    Height = 90,
+                    BackColor = Color.Gainsboro
+                };
+                skel.Controls.Add(answersBox);
+
+                // 3 answer rows
+                int y = 10;
+                for (int a = 0; a < 3; a++)
+                {
+                    answersBox.Controls.Add(new Panel
+                    {
+                        Left = 20,
+                        Top = y,
+                        Width = answersBox.Width - 40,
+                        Height = 18,
+                        BackColor = Color.LightGray
+                    });
+                    y += 25;
+                }
+
+                flow.Controls.Add(skel);
+            }
+
+            // start shimmer
+            Helper.StartShimmerAnimation(flow);
+        }
+
         private void AddQuestion()
         {
             questionList.Add(new Question
@@ -705,12 +853,19 @@ namespace Lab_8.Forms
                 quizNamePanel, quizTablePanel, quizCategoryPanel,
                 //Role
                 roleNamePanel, roleIsActivePanel, flpRole,
-                rolePaginatePanel, roleTablePanel, moduleListPanel
+                rolePaginatePanel, roleTablePanel, moduleListPanel,
+                //Permission
+                permissionNamePanel, permissionModulePanel, tablePermissionPanel,
+                permissionPaginatePanel,
+                //Category
+                categoryNamePanel, tableCategory, categoryPaginatePanel,
+                categoryIsActivePanel
             }).Cast<Panel>())
             {
                 UIStyle.RoundPanel(panel, 15);
             }
         }
+
         private void LoadImage(PictureBox pictureBox, object entityObj)
         {
             var imageProp = entityObj.GetType().GetProperty("Image");
@@ -802,6 +957,16 @@ namespace Lab_8.Forms
             cbIsActiveRole.DataBindings.Add("SelectedItem", rolelist, "IsActive", true, DataSourceUpdateMode.Never);
         }
 
+        private void BindCategoryData()
+        {
+            ClearControlBindings(txbCategoryName, cbCategoryIsActive);
+
+            if (categorylist == null || categorylist.Count == 0) return;
+
+            txbCategoryName.DataBindings.Add("Text", categorylist, "Name", true, DataSourceUpdateMode.Never);
+            cbCategoryIsActive.DataBindings.Add("SelectedItem", categorylist, "IsActive", true, DataSourceUpdateMode.Never);
+        }
+
         private void BindQuizData()
         {
             ClearControlBindings(txbQuizName, cbQuizDifficulty, cbQuizCategory);
@@ -813,6 +978,16 @@ namespace Lab_8.Forms
             cbQuizCategory.DataBindings.Add("Text", quizlist, "Category", true, DataSourceUpdateMode.Never);
 
             dtgvQuiz.SelectionChanged += (s, e) => DisplaySelectedQuizImage(dtgvQuiz, pbQuizImage);
+        }
+
+        private void BindPermissionData()
+        {
+            ClearControlBindings(txbPermissionName, cbPermissionModule);
+
+            if (permissionlist == null || permissionlist.Count == 0) return;
+
+            txbPermissionName.DataBindings.Add("Text", permissionlist, "Name", true, DataSourceUpdateMode.Never);
+            cbPermissionModule.DataBindings.Add("Text", permissionlist, "Module", true, DataSourceUpdateMode.Never);
         }
 
         private async Task LoadUserList()
@@ -910,6 +1085,84 @@ namespace Lab_8.Forms
             DisplaySelectedQuizImage(dtgvQuiz, pbQuizImage);
         }
 
+        private async Task LoadCategoryList()
+        {
+            var result = await CategoryService.Instance.GetListCategory(
+                _pageSize,
+                _currentPageCategory,
+                txbSearchCategory.Text == "Search category" ? null : txbSearchCategory.Text);
+
+            if (result == null || !result.Items.Any())
+            {
+                dtgvCategory.DataSource = null;
+                return;
+            }
+
+            categorylist.DataSource = result.Items.Select(c => new
+            {
+                c.Id,
+                c.Name,
+                IsActive = c.IsActive ? "Active" : "Inactive",
+            }).ToList();
+
+            dtgvCategory.DataSource = categorylist;
+
+            _totalPagesCategory = result.TotalPages;
+
+            LayoutForm.RenderPagination(
+               categoryPaginatePanel,
+               _currentPageCategory,
+               _totalPagesCategory,
+               async (newPage) =>
+               {
+                   _currentPageCategory = newPage;
+                   await LoadCategoryList();
+               }
+            );
+
+            cbCategoryIsActive.DataSource = new List<string> { "Active", "Inactive" };
+
+            BindCategoryData();
+        }
+
+        private async Task LoadPermissionList()
+        {
+            var result = await PermissionService.Instance.GetListPermission(
+                _pageSize,
+                _currentPagePermission,
+                txbSearchPermission.Text == "Search permission" ? null : txbSearchPermission.Text);
+
+            if (result == null || !result.Items.Any())
+            {
+                dtgvPermission.DataSource = null;
+                return;
+            }
+
+            permissionlist.DataSource = result.Items.Select(p => new
+            {
+                p.Id,
+                p.Name,
+                p.Module
+            }).ToList();
+
+            dtgvPermission.DataSource = permissionlist; 
+
+            _totalPagesPermission = result.TotalPages;
+
+            LayoutForm.RenderPagination(
+               permissionPaginatePanel,
+               _currentPagePermission,
+               _totalPagesPermission,
+               async (newPage) =>
+               {
+                   _currentPagePermission = newPage;
+                   await LoadPermissionList();
+               }
+            );
+
+            BindPermissionData();
+        }
+
         private async Task ReloadUser()
         {
             await LoadUserList();
@@ -952,11 +1205,41 @@ namespace Lab_8.Forms
 
             ApplyRolePermissionsToUI();
 
+            await LoadUserList();
+
             await LoadDataIntoCombobox(
                 cbUserRole,
                 () => RoleService.Instance.GetListRole(100, 1, null));
 
             roleAction = null;
+        }
+
+        private async Task ReloadPermission()
+        {
+            await LoadPermissionList();
+
+            ButtonAction(new Button[] { btnEditPermission, btnDeletePermission, btnAddPermission }, true);
+            ButtonAction(new Button[] { btnSavePermission, btnCancelPermission }, false);
+
+            permissionAction = null;
+
+            await LoadGroupPermission();
+        }
+
+        private async Task ReloadCategory()
+        {
+            await LoadCategoryList();
+
+            ButtonAction(new Button[] { btnEditCategory, btnDeleteCategory, btnAddCategory }, true);
+            ButtonAction(new Button[] { btnSaveCategory, btnCancelCategory }, false);
+
+            categoryAction = null;
+
+            await LoadQuizList();
+
+            await LoadDataIntoCombobox(
+                cbQuizCategory,
+                () => CategoryService.Instance.GetListCategory(100, 1, null));
         }
 
         private void ClearAllCheckoxPermission()
@@ -977,10 +1260,15 @@ namespace Lab_8.Forms
         #region Events
         public async void LoadData(object sender, EventArgs e)
         {
+            LoadQuizDifficulty();
+            LoadPermissionModule();
+
             var userTask = LoadUserList();
             var quizTask = LoadQuizList();
+            var permissionTask = LoadPermissionList();  
             var groupPermissionTask = LoadGroupPermission();
             var roleTask = GetListRole();
+            var categoryTask = LoadCategoryList();  
 
             var quizTaskToComboBox = LoadDataIntoCombobox(
                 cbQuizName,
@@ -999,15 +1287,15 @@ namespace Lab_8.Forms
                 quizCategoryToComboBoxTask, 
                 userRoleToComboBoxTask,
                 groupPermissionTask,
-                roleTask
+                roleTask,
+                permissionTask,
+                categoryTask
             );
 
             if (cbQuizName.SelectedItem is Quiz selectedQuiz)
             {
                 await LoadQuestionsByQuizId(selectedQuiz.Id);
             }
-
-            LoadQuizDifficulty();
         }
 
         private async void txbSearchUser_TextChanged(object sender, EventArgs e)
@@ -1054,6 +1342,46 @@ namespace Lab_8.Forms
             roleAction = "ADD";
 
             ClearAllCheckoxPermission();
+        }
+
+        private void btnAddPermission_Click(object sender, EventArgs e)
+        {
+            ButtonAction(new Button[] { btnEditPermission, btnDeletePermission, btnAddPermission }, false);
+            ButtonAction(new Button[] { btnSavePermission, btnCancelPermission }, true);
+
+            ClearControlBindings(txbPermissionName, cbPermissionModule);
+
+            permissionAction = "ADD";
+        }
+
+        private void btnAddCategory_Click(object sender, EventArgs e)
+        {
+            ButtonAction(new Button[] { btnEditCategory, btnDeleteCategory, btnAddCategory }, false);
+            ButtonAction(new Button[] { btnSaveCategory, btnCancelCategory }, true);
+
+            ClearControlBindings(txbCategoryName, cbCategoryIsActive);
+
+            categoryAction = "ADD";
+        }
+
+        private void btnCancelCategory_Click(object sender, EventArgs e)
+        {
+            ButtonAction(new Button[] { btnEditCategory, btnDeleteCategory, btnAddCategory }, true);
+            ButtonAction(new Button[] { btnSaveCategory, btnCancelCategory }, false);
+
+            BindCategoryData();
+
+            categoryAction = null;
+        }
+
+        private void btnCancelPermission_Click(object sender, EventArgs e)
+        {
+            ButtonAction(new Button[] { btnEditPermission, btnDeletePermission, btnAddPermission }, true);
+            ButtonAction(new Button[] { btnSavePermission, btnCancelPermission }, false);
+
+            BindPermissionData();
+
+            permissionAction = null;
         }
 
         private void btnCancelUser_Click(object sender, EventArgs e)
@@ -1200,6 +1528,41 @@ namespace Lab_8.Forms
             }
         }
 
+        private async void btnSavePermission_Click(object sender, EventArgs e)
+        {
+            switch (permissionAction)
+            {
+                case "ADD":
+                    Permission permission = new Permission
+                    {
+                        Name = txbPermissionName.Text,
+                        Module = cbPermissionModule.Text,
+                    };
+
+                    await PermissionService.Instance.InsertPermission(permission);
+
+                    await ReloadPermission();
+                break;
+
+                case "EDIT":
+                    Permission exisingPermission = new Permission
+                    {
+                        Id = _selectedPermissionId,
+                        Name = txbPermissionName.Text,
+                        Module = cbPermissionModule.Text,
+                    };
+
+                    await PermissionService.Instance.UpdatePermission(exisingPermission);
+
+                    await ReloadPermission();
+                break;
+
+                default:
+                    Alert.ShowAlert("Invalid action", Alert.AlertType.Error);
+                break;
+            }
+        }
+
         private async void btnSaveRole_Click(object sender, EventArgs e)
         {
             switch (roleAction)
@@ -1220,6 +1583,41 @@ namespace Lab_8.Forms
             }
         }
 
+        private async void btnSaveCategory_Click(object sender, EventArgs e)
+        {
+            switch (categoryAction)
+            {
+                case "ADD":
+                    Category category = new Category
+                    {
+                        Name = txbCategoryName.Text,
+                        IsActive = cbCategoryIsActive.SelectedItem?.ToString() == "Active"
+                    };
+
+                    await CategoryService.Instance.InsertCategory(category);
+                    
+                    await ReloadCategory();
+                break;
+
+                case "EDIT":
+                    Category updatedCategory = new Category
+                    {
+                        Id = _selectedCategoryId,
+                        Name = txbCategoryName.Text,
+                        IsActive = cbCategoryIsActive.SelectedItem?.ToString() == "Active"
+                    };
+
+                    await CategoryService.Instance.UpdateCategory(updatedCategory);
+
+                    await ReloadCategory();
+                break;
+
+                default:
+                    Alert.ShowAlert("Invalid action", Alert.AlertType.Error);
+                break;
+            }
+        }
+
         private void btnUploadUserImage_Click(object sender, EventArgs e)
         {
             selectedUserImageBytes = Helper.UploadImage(userFileDialog, pbUserImage);
@@ -1230,12 +1628,30 @@ namespace Lab_8.Forms
             selectedQuizImageBytes = Helper.UploadImage(quizFileDialog, pbQuizImage);
         }
 
+        private void btnEditCategory_Click(object sender, EventArgs e)
+        {
+            ButtonAction(new Button[] { btnEditCategory, btnDeleteCategory, btnAddCategory }, false);
+            ButtonAction(new Button[] { btnSaveCategory, btnCancelCategory }, true);
+
+            categoryAction = "EDIT";
+        }
+
         private void btnEditRole_Click(object sender, EventArgs e)
         {
             ButtonAction(new Button[] { btnAddRole, btnEditRole, btnDeleteRole }, false);
             ButtonAction(new Button[] { btnSaveRole, btnCancelRole }, true);
 
             roleAction = "EDIT";
+        }
+
+        private void btnEditPermission_Click(object sender, EventArgs e)
+        {
+            ButtonAction(new Button[] { btnEditPermission, btnDeletePermission, btnAddPermission }, false);
+            ButtonAction(new Button[] { btnSavePermission, btnCancelPermission }, true);
+
+            BindPermissionData();
+
+            permissionAction = "EDIT";
         }
 
         private void btnEditUser_Click(object sender, EventArgs e)
@@ -1293,6 +1709,32 @@ namespace Lab_8.Forms
             }
         }
 
+        private async void btnDeletePermission_Click(object sender, EventArgs e)
+        {
+            bool confirm = Confirmation.ShowConfirm("Confirm Delete",
+              "Are you sure you want to delete this permission?");
+
+            if (confirm)
+            {
+                await PermissionService.Instance.DeletePermission(_selectedPermissionId);
+
+                await ReloadPermission();
+            }
+        }
+
+        private async void btnDeleteCategory_Click(object sender, EventArgs e)
+        {
+            bool confirm = Confirmation.ShowConfirm("Confirm Delete",
+             "Are you sure you want to delete this category?");
+
+            if (confirm)
+            {
+                await CategoryService.Instance.DeleteCategory(_selectedCategoryId);
+
+                await ReloadCategory();
+            }
+        }
+
         private async void cbQuizName_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cbQuizName.SelectedItem is Quiz selectedQuiz)
@@ -1324,9 +1766,35 @@ namespace Lab_8.Forms
             }
         }
 
+        private void dtgvPermission_SelectionChanged(object sender, EventArgs e)
+        {
+            if(dtgvPermission.CurrentRow != null)
+            {
+                _selectedPermissionId = (int)dtgvPermission.CurrentRow.Cells["Id"].Value;
+            }
+        }
+
+        private void dtgvCategory_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dtgvCategory.CurrentRow != null)
+            {
+                _selectedCategoryId = (int)dtgvCategory.CurrentRow.Cells["Id"].Value;
+            }
+        }
+
         private async void txbSearchRole_TextChanged(object sender, EventArgs e)
         {
             await GetListRole();
+        }
+
+        private async void txbSearchPermission_TextChanged(object sender, EventArgs e)
+        {
+            await LoadPermissionList(); 
+        }
+
+        private async void txbSearchCategory_TextChanged(object sender, EventArgs e)
+        {
+            await LoadCategoryList();
         }
         #endregion
     }
