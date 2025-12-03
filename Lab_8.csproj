@@ -270,12 +270,6 @@
     <Compile Include="Forms\Confirmation.Designer.cs">
       <DependentUpon>Confirmation.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\ForgotPassword.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\ForgotPassword.Designer.cs">
-      <DependentUpon>ForgotPassword.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\Home.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -287,6 +281,12 @@
     </Compile>
     <Compile Include="Forms\Login.Designer.cs">
       <DependentUpon>Login.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Register.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Register.Designer.cs">
+      <DependentUpon>Register.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\UserProfile.cs">
       <SubType>Form</SubType>
@@ -307,6 +307,18 @@
     <Compile Include="Migrations\20251126073906_AddCodeIdAndCodeExpireForUser.cs" />
     <Compile Include="Migrations\20251126073906_AddCodeIdAndCodeExpireForUser.Designer.cs">
       <DependentUpon>20251126073906_AddCodeIdAndCodeExpireForUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20251202082041_RemoveTotalScore.cs" />
+    <Compile Include="Migrations\20251202082041_RemoveTotalScore.Designer.cs">
+      <DependentUpon>20251202082041_RemoveTotalScore.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20251203022952_ChangeToTextForQuestionAndAnswer.cs" />
+    <Compile Include="Migrations\20251203022952_ChangeToTextForQuestionAndAnswer.Designer.cs">
+      <DependentUpon>20251203022952_ChangeToTextForQuestionAndAnswer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20251203084150_RemoveCodeIdCodeExpireFromUser.cs" />
+    <Compile Include="Migrations\20251203084150_RemoveCodeIdCodeExpireFromUser.Designer.cs">
+      <DependentUpon>20251203084150_RemoveCodeIdCodeExpireFromUser.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\QuizDBContextModelSnapshot.cs" />
     <Compile Include="Models\Answer.cs" />
@@ -342,6 +354,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Login.resx">
       <DependentUpon>Login.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Register.resx">
+      <DependentUpon>Register.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\UserProfile.resx">
       <DependentUpon>UserProfile.cs</DependentUpon>

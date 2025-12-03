@@ -11,6 +11,7 @@ namespace Lab_8.Models
         public int Id { get; set; }
 
         [Required]
+        [Column(TypeName = "NVARCHAR(MAX)")]
         public string Name { get; set; }
 
         [Column(TypeName = "VARBINARY(MAX)")]

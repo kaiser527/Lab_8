@@ -1,12 +1,15 @@
 ﻿using Lab_8.Forms;
 using Lab_8.Models;
 using Lab_8.Services;
+using Lab_8.Utils;
+using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WinFormApp.Forms;
 
 namespace Lab_8
 {
@@ -19,54 +22,171 @@ namespace Lab_8
 
         private Quiz _quiz;
         private int _currentQuestionIndex = 0;
-
         private readonly Dictionary<int, Answer> _userSelectedAnswers = new Dictionary<int, Answer>();
+        private bool _isQuizFinished = false;
+        private readonly bool _isHistoryView;
 
-        public UserQuiz(int quizId, int historyId, Home home)
+        public UserQuiz(int quizId, int historyId, Home home, bool isHistoryView = false)
         {
             InitializeComponent();
             _quizId = quizId;
             _historyId = historyId;
-            Load += UserQuiz_Load;
+            _isHistoryView = isHistoryView;
             _home = home;
+            StylePanels();
+
+            Load += UserQuiz_Load;
         }
 
-        #region Methods
+        private void StylePanels()
+        {
+            UIStyle.RoundPanel(leftPanel, 15);
+            UIStyle.RoundPanel(rightPanel, 15);
+        }
+
+        #region Load Quiz
         private async Task LoadQuiz()
         {
+            ShowSkeletonLoading();
+
             _quiz = await QuizService.Instance.GetQuizById(_quizId);
+
+            Helper.StopShimmerAnimation();
+
+            flpQuestion.Controls.Clear();
+
             if (_quiz == null) return;
 
             quizNameLabel.Text = _quiz.Name;
 
-            // ListView setup - tighter spacing
-            listViewQuestion.View = View.Tile;
-            listViewQuestion.TileSize = new Size(200, 35); // reduced height
-            listViewQuestion.Font = new Font("Segoe UI", 12, FontStyle.Regular);
-            listViewQuestion.FullRowSelect = true;
-            listViewQuestion.MultiSelect = false;
-            listViewQuestion.Items.Clear();
+            flpQuestion.AutoScroll = true;
+            flpQuestion.WrapContents = true;
+            flpQuestion.FlowDirection = FlowDirection.LeftToRight;
 
-            for (int i = 0; i < _quiz.Questions.Count; i++)
+            // Load user answers if viewing history
+            if (_isHistoryView)
             {
-                listViewQuestion.Items.Add($"Question {i + 1}");
+                await LoadUserAnswer();
             }
 
-            listViewQuestion.SelectedIndexChanged += ListViewQuestion_SelectedIndexChanged;
+            // Create question buttons
+            int buttonSize = 62;
+            for (int i = 0; i < _quiz.Questions.Count; i++)
+            {
+                int index = i;
+                Button btn = new Button
+                {
+                    Text = (i + 1).ToString(),
+                    Width = buttonSize,
+                    Height = buttonSize,
+                    Margin = new Padding(8),
+                    Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                    FlatStyle = FlatStyle.Flat,
+                    BackColor = Color.LightGray,
+                    Tag = index
+                };
+                btn.FlatAppearance.BorderSize = 0;
+                btn.Click += (s, e) =>
+                {
+                    _currentQuestionIndex = (int)((Button)s).Tag;
+                    DisplayQuestion(_currentQuestionIndex);
+                    UpdateProgressBar(_currentQuestionIndex);
+                    HighlightCurrentQuestionButton();
+                };
+                flpQuestion.Controls.Add(btn);
+            }
+
+            HighlightCurrentQuestionButton();
 
             if (_quiz.Questions.Any())
             {
-                listViewQuestion.Items[0].Selected = true;
+                DisplayQuestion(0);
+                UpdateProgressBar(0);
             }
         }
+        #endregion
 
-        private async Task DisplayQuestion(int index)
+        #region Highlight Question Button
+        private void HighlightCurrentQuestionButton()
         {
-            QuestionAnswerGroupbox.Controls.Clear();
+            foreach (Control control in flpQuestion.Controls)
+            {
+                if (control is Button btn)
+                {
+                    int index = (int)btn.Tag;
 
-            if (_quiz?.Questions == null || index < 0 || index >= _quiz.Questions.Count) return;
+                    if (_isQuizFinished || _isHistoryView)
+                    {
+                        var question = _quiz.Questions.ToList()[index];
 
-            var question = _quiz.Questions.ElementAt(index);
+                        // Safely get correct answer
+                        var correctAnswer = question.Answers.FirstOrDefault(a => a.IsCorrect);
+
+                        _userSelectedAnswers.TryGetValue(question.Id, out var userAnswer);
+
+                        if (correctAnswer != null)
+                        {
+                            btn.BackColor = (userAnswer != null && userAnswer.Id == correctAnswer.Id)
+                                ? Color.LimeGreen
+                                : Color.Red;
+                        }
+                        else
+                        {
+                            // If no correct answer is available, use neutral color
+                            btn.BackColor = Color.Gray;
+                        }
+
+                        btn.ForeColor = Color.White;
+                        btn.FlatAppearance.BorderSize = index == _currentQuestionIndex ? 2 : 0;
+                        btn.FlatAppearance.BorderColor = Color.Black;
+                        continue;
+                    }
+
+
+                    if (index == _currentQuestionIndex)
+                    {
+                        btn.BackColor = Color.DodgerBlue;
+                        btn.ForeColor = Color.White;
+                        btn.Font = new Font("Segoe UI", 16, FontStyle.Bold);
+                    }
+                    else
+                    {
+                        btn.BackColor = Color.LightGray;
+                        btn.ForeColor = Color.Black;
+                        btn.Font = new Font("Segoe UI", 14, FontStyle.Bold);
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region Display Question
+        private void DisplayQuestion(int index)
+        {
+            questionsPanel.Controls.Clear();
+            if (_quiz?.Questions == null || index < 0 || index >= _quiz.Questions.Count)
+                return;
+
+            var question = _quiz.Questions.ToList()[index];
+            int y = 15;
+            int marginLeft = 15;
+            bool readOnly = _isHistoryView || _isQuizFinished;
+
+            // Image
+            if (question.Image != null && question.Image.Length > 0)
+            {
+                PictureBox pic = new PictureBox
+                {
+                    Image = Helper.ByteArrayToImage(question.Image),
+                    SizeMode = PictureBoxSizeMode.Zoom,
+                    Location = new Point(marginLeft, y),
+                    Width = questionsPanel.Width - 2 * marginLeft,
+                    Height = 150,
+                    BorderStyle = BorderStyle.FixedSingle
+                };
+                questionsPanel.Controls.Add(pic);
+                y += pic.Height + 10;
+            }
 
             // Question title
             Label lblTitle = new Label
@@ -74,18 +194,44 @@ namespace Lab_8
                 Text = question.Name,
                 Font = new Font("Segoe UI", 14, FontStyle.Bold),
                 AutoSize = true,
-                MaximumSize = new Size(QuestionAnswerGroupbox.Width - 40, 0),
-                Location = new Point(20, 20),
-                TextAlign = ContentAlignment.TopLeft
+                MaximumSize = new Size(questionsPanel.Width - 2 * marginLeft, 0),
+                Location = new Point(marginLeft, y)
             };
-            QuestionAnswerGroupbox.Controls.Add(lblTitle);
+            questionsPanel.Controls.Add(lblTitle);
+            y += lblTitle.Height + 10;
 
-            int y = lblTitle.Bottom + 20;
-            var userId = UserService.Instance.User.Id;
+            // Audio
+            if (question.Audio != null && question.Audio.Length > 0)
+            {
+                Button btnPlayPause = new Button
+                {
+                    Text = "▶",
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                    Width = 100,
+                    Height = 30,
+                    Location = new Point(marginLeft, y),
+                    Enabled = !readOnly
+                };
 
-            // Get all existing answers for this history
-            var userAnswers = await UserService.Instance.GetUserAnswersByHistory(_historyId);
+                btnPlayPause.Click += (s, e) =>
+                {
+                    if (question.WaveOut != null && question.WaveOut.PlaybackState == PlaybackState.Playing)
+                    {
+                        Helper.PauseAudio(question);
+                        btnPlayPause.Text = "▶";
+                    }
+                    else
+                    {
+                        Helper.PlayAudio(question, btnPlayPause);
+                        btnPlayPause.Text = "⏸";
+                    }
+                };
 
+                questionsPanel.Controls.Add(btnPlayPause);
+                y += btnPlayPause.Height + 10;
+            }
+
+            // Display answers
             foreach (var answer in question.Answers)
             {
                 RadioButton rb = new RadioButton
@@ -93,74 +239,78 @@ namespace Lab_8
                     Text = answer.Name,
                     Font = new Font("Segoe UI", 12),
                     AutoSize = true,
-                    Location = new Point(40, y),
-                    Tag = answer
+                    Location = new Point(marginLeft + 20, y),
+                    Tag = answer,
+                    Enabled = !readOnly
                 };
 
-                // Pre-check if this question has an existing answer
-                var existingAnswer = userAnswers
-                    .FirstOrDefault(ua => ua.Answer != null && ua.Answer.QuestionId == question.Id);
-
-                if (existingAnswer != null && existingAnswer.AnswerId == answer.Id)
-                {
+                if (_userSelectedAnswers.TryGetValue(question.Id, out var selected) && selected.Id == answer.Id)
                     rb.Checked = true;
-                }
 
                 rb.CheckedChanged += async (s, e) =>
                 {
-                    if (!rb.Checked) return;
+                    if (!rb.Checked || readOnly) return;
 
                     var selectedAnswer = (Answer)rb.Tag;
-
-                    // Update local dictionary
                     _userSelectedAnswers[selectedAnswer.QuestionId] = selectedAnswer;
 
                     await UserService.Instance.SaveUserAnswerEachCheck(new UserAnswer
                     {
-                        UserId = userId,
+                        UserId = UserService.Instance.User.Id,
                         HistoryId = _historyId,
-                        AnswerId = answer.Id
+                        AnswerId = selectedAnswer.Id
                     });
-
-                    // Update local cache to reflect selection
-                    if (existingAnswer != null)
-                    {
-                        existingAnswer.AnswerId = answer.Id;
-                    }
-                    else
-                    {
-                        userAnswers.Add(new UserAnswer
-                        {
-                            UserId = userId,
-                            HistoryId = _historyId,
-                            AnswerId = answer.Id
-                        });
-                    }
                 };
 
-                QuestionAnswerGroupbox.Controls.Add(rb);
+                questionsPanel.Controls.Add(rb);
                 y += 35;
             }
 
-            // --- Navigation buttons ---
+            AddNavigationButtons(index);
+
+            if (readOnly)
+                ShowCorrectAnswer(index);
+        }
+        #endregion
+
+        #region Load User Answer
+        private async Task LoadUserAnswer()
+        {
+            var allUserAnswers = await UserService.Instance.GetUserAnswersByHistory(_historyId);
+            foreach (var ua in allUserAnswers)
+            {
+                var question = _quiz.Questions.FirstOrDefault(q => q.Id == ua.Answer.QuestionId);
+                if (question != null)
+                {
+                    var answer = question.Answers.FirstOrDefault(a => a.Id == ua.AnswerId);
+                    if (answer != null)
+                        _userSelectedAnswers[question.Id] = answer;
+                }
+            }
+        }
+        #endregion
+
+        #region Navigation Buttons
+        private void AddNavigationButtons(int index)
+        {
             int buttonWidth = 95;
             int buttonHeight = 35;
-            int buttonTop = QuestionAnswerGroupbox.Height - buttonHeight - 10;
+            int buttonTop = questionsPanel.Height - buttonHeight - 10;
             int spacing = 20;
             int leftPrev = 40;
             int leftNext = leftPrev + buttonWidth + spacing;
             int leftFinish = leftNext + buttonWidth + spacing;
 
-            Action<Button> styleButton = btn =>
+            void styleButton(Button btn)
             {
                 btn.BackColor = Color.LightGray;
                 btn.ForeColor = Color.Black;
-                btn.Font = new Font("Microsoft Sans Serif", 10.8F, FontStyle.Regular);
+                btn.Font = new Font("Microsoft Sans Serif", 10.8F);
                 btn.FlatStyle = FlatStyle.Flat;
                 btn.FlatAppearance.BorderSize = 0;
-            };
+            }
 
-            // Previous button
+            // Previous
             Button btnPrev = new Button
             {
                 Text = "Previous",
@@ -175,12 +325,14 @@ namespace Lab_8
                 if (_currentQuestionIndex > 0)
                 {
                     _currentQuestionIndex--;
-                    listViewQuestion.Items[_currentQuestionIndex].Selected = true;
+                    HighlightCurrentQuestionButton();
+                    DisplayQuestion(_currentQuestionIndex);
+                    UpdateProgressBar(_currentQuestionIndex);
                 }
             };
-            QuestionAnswerGroupbox.Controls.Add(btnPrev);
+            questionsPanel.Controls.Add(btnPrev);
 
-            // Next button
+            // Next
             Button btnNext = new Button
             {
                 Text = "Next",
@@ -195,61 +347,243 @@ namespace Lab_8
                 if (_currentQuestionIndex < _quiz.Questions.Count - 1)
                 {
                     _currentQuestionIndex++;
-                    listViewQuestion.Items[_currentQuestionIndex].Selected = true;
+                    HighlightCurrentQuestionButton();
+                    DisplayQuestion(_currentQuestionIndex);
+                    UpdateProgressBar(_currentQuestionIndex);
                 }
             };
-            QuestionAnswerGroupbox.Controls.Add(btnNext);
+            questionsPanel.Controls.Add(btnNext);
 
-            // Finish button
+            // Finish
             Button btnFinish = new Button
             {
                 Text = "Finish",
                 Width = buttonWidth,
                 Height = buttonHeight,
-                Location = new Point(leftFinish, buttonTop)
+                Location = new Point(leftFinish, buttonTop),
+                Visible = !_isHistoryView,
+                Enabled = !_isQuizFinished
             };
             styleButton(btnFinish);
+
             btnFinish.Click += async (s, e) =>
             {
-                var checkedAnswers = _userSelectedAnswers.Values.ToList();
+                _isQuizFinished = true;
 
+                // Refresh UI first
+                HighlightCurrentQuestionButton();
+                DisplayQuestion(_currentQuestionIndex);
+
+                // Batch save all answers to DB
+                foreach (var ua in _userSelectedAnswers)
+                {
+                    await UserService.Instance.SaveUserAnswerEachCheck(new UserAnswer
+                    {
+                        UserId = UserService.Instance.User.Id,
+                        HistoryId = _historyId,
+                        AnswerId = ua.Value.Id
+                    });
+                }
+
+                int correctCount = 0;
+                int totalCount = 0; 
+
+                foreach (Control control in flpQuestion.Controls)
+                {
+                    if (control is Button btn)
+                    {
+                        int indexQ = (int)btn.Tag;
+                        var question = _quiz.Questions.ToList()[indexQ];
+                      
+                        var correctAnswer = question.Answers?.FirstOrDefault(a => a.IsCorrect);
+
+                        if (correctAnswer == null)
+                        {
+                            btn.BackColor = Color.Gray; 
+                            btn.ForeColor = Color.White;
+                            continue;
+                        }
+
+                        totalCount++;
+
+                        _userSelectedAnswers.TryGetValue(question.Id, out var userAnswer);
+
+                        if (userAnswer != null && userAnswer.Id == correctAnswer.Id)
+                        {
+                            btn.BackColor = Color.LimeGreen;
+                            correctCount++;
+                        }
+                        else
+                        {
+                            btn.BackColor = Color.Red;
+                        }
+
+                        btn.ForeColor = Color.White;
+                    }
+                }
+
+                // Submit quiz history
                 await HistoryService.Instance.SubmitQuizHistory(new History
                 {
                     Id = _historyId,
                     QuizId = _quizId
-                }, checkedAnswers);
+                });
+
+                double scorePercentage = totalCount > 0 ? (double)correctCount / totalCount * 100 : 0;
+                bool confirm = Confirmation.ShowConfirm(
+                    "Submit quiz successfully",
+                    $"Your final score is {Math.Round(scorePercentage, 2)}%. Do you want to close the quiz?");
+
+                if (confirm)
+                    Close();
 
                 await _home.LoadQuiz();
                 await _home.ShowHistoryAsync(_quizId);
-
-                MessageBox.Show("Quiz submitted successfully!");
-
-                Close();
             };
-            QuestionAnswerGroupbox.Controls.Add(btnFinish);
-        }
 
+            questionsPanel.Controls.Add(btnFinish);
+        }
+        #endregion
+
+        #region Show Correct Answer
+        private void ShowCorrectAnswer(int index)
+        {
+            if (_quiz == null || _quiz.Questions == null || index < 0 || index >= _quiz.Questions.Count)
+                return;
+
+            var question = _quiz.Questions.ToList()[index];
+
+            if (question.Answers == null)
+                return;
+
+            var correctAnswer = question.Answers.FirstOrDefault(a => a.IsCorrect);
+            if (correctAnswer == null)
+                return; // no correct answer found
+
+            Label lblCorrect = new Label
+            {
+                Text = "Correct Answer: " + correctAnswer.Name,
+                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                ForeColor = Color.Green,
+                AutoSize = true,
+                Location = new Point(20, questionsPanel.Height - 85)
+            };
+
+            questionsPanel.Controls.Add(lblCorrect);
+            lblCorrect.BringToFront();
+        }
+        #endregion
+
+        #region Progress Bar
         private void UpdateProgressBar(int index)
         {
             if (_quiz.Questions.Count == 0) return;
-            int progress = (int)(((index + 1) / (float)_quiz.Questions.Count) * 100);
+            int progress = (int)((index + 1) / (float)_quiz.Questions.Count * 100);
             progressBar1.Value = progress;
         }
         #endregion
 
-        #region Events
-        private async void ListViewQuestion_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (listViewQuestion.SelectedIndices.Count == 0) return;
-
-            _currentQuestionIndex = listViewQuestion.SelectedIndices[0];
-            await DisplayQuestion(_currentQuestionIndex);
-            UpdateProgressBar(_currentQuestionIndex);
-        }
-
+        #region Form Load
         private async void UserQuiz_Load(object sender, EventArgs e)
         {
+            ShowQuestionSkeleton();
             await LoadQuiz();
+            await LoadUserAnswer();
+            DisplayQuestion(_currentQuestionIndex);
+            HighlightCurrentQuestionButton();
+        }
+        #endregion
+
+        #region Skeleton
+        private Panel CreateSkeletonCard()
+        {
+            Panel card = new Panel
+            {
+                Width = 62,
+                Height = 62,
+                Margin = new Padding(8),
+                BackColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle
+            };
+
+            // Placeholder panel for shimmer
+            Panel shimmer = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.FromArgb(220, 220, 220)
+            };
+
+            card.Controls.Add(shimmer);
+            return card;
+        }
+
+        private void ShowSkeletonLoading()
+        {
+            flpQuestion.Controls.Clear();
+
+            // Add 8 fake skeleton tiles
+            for (int i = 0; i < 20; i++)
+            {
+                flpQuestion.Controls.Add(CreateSkeletonCard());
+            }
+
+            Helper.StartShimmerAnimation(flpQuestion);
+        }
+
+        private void ShowQuestionSkeleton()
+        {
+            questionsPanel.Controls.Clear();
+
+            // Create a FlowLayoutPanel because shimmer only works on FlowLayoutPanel
+            FlowLayoutPanel skeletonContainer = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = false,
+                WrapContents = false,
+                FlowDirection = FlowDirection.TopDown,
+                BackColor = Color.WhiteSmoke
+            };
+
+            questionsPanel.Controls.Add(skeletonContainer);
+
+            int marginLeft = 20;
+            int width = questionsPanel.Width - 40;
+
+            // ----- Image placeholder -----
+            Panel imgBlock = new Panel
+            {
+                Width = width,
+                Height = 150,
+                Margin = new Padding(marginLeft, 20, 0, 20),
+                BackColor = Color.FromArgb(220, 220, 220)
+            };
+            skeletonContainer.Controls.Add(imgBlock);
+
+            // ----- Title placeholder -----
+            Panel titleBlock = new Panel
+            {
+                Width = width,
+                Height = 30,
+                Margin = new Padding(marginLeft, 0, 0, 20),
+                BackColor = Color.FromArgb(220, 220, 220)
+            };
+            skeletonContainer.Controls.Add(titleBlock);
+
+            // ----- 4 Answer placeholders -----
+            for (int i = 0; i < 4; i++)
+            {
+                Panel answerBlock = new Panel
+                {
+                    Width = width - 20,
+                    Height = 25,
+                    Margin = new Padding(marginLeft + 20, 0, 0, 20),
+                    BackColor = Color.FromArgb(220, 220, 220)
+                };
+                skeletonContainer.Controls.Add(answerBlock);
+            }
+
+            // Start shimmer on FlowLayoutPanel (now correct type)
+            Helper.StartShimmerAnimation(skeletonContainer);
         }
         #endregion
     }

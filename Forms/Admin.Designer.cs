@@ -65,7 +65,6 @@
             this.tpUser = new System.Windows.Forms.TabPage();
             this.userPaginatePanel = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.btnViewHistory = new System.Windows.Forms.Button();
             this.userRolePanel = new System.Windows.Forms.Panel();
             this.cbUserRole = new System.Windows.Forms.ComboBox();
             this.label10 = new System.Windows.Forms.Label();
@@ -553,7 +552,6 @@
             // 
             // panel3
             // 
-            this.panel3.Controls.Add(this.btnViewHistory);
             this.panel3.Controls.Add(this.userRolePanel);
             this.panel3.Controls.Add(this.txbSearchUser);
             this.panel3.Controls.Add(this.btnCancelUser);
@@ -569,16 +567,6 @@
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(1082, 241);
             this.panel3.TabIndex = 2;
-            // 
-            // btnViewHistory
-            // 
-            this.btnViewHistory.BackColor = System.Drawing.Color.LightGray;
-            this.btnViewHistory.Location = new System.Drawing.Point(551, 140);
-            this.btnViewHistory.Name = "btnViewHistory";
-            this.btnViewHistory.Size = new System.Drawing.Size(142, 41);
-            this.btnViewHistory.TabIndex = 8;
-            this.btnViewHistory.Text = "History";
-            this.btnViewHistory.UseVisualStyleBackColor = false;
             // 
             // userRolePanel
             // 
@@ -1578,7 +1566,6 @@
         private System.Windows.Forms.Panel tablePermissionPanel;
         private System.Windows.Forms.DataGridView dtgvPermission;
         private System.Windows.Forms.TabPage tpCategory;
-        private System.Windows.Forms.Button btnViewHistory;
         private System.Windows.Forms.Panel panel5;
         private System.Windows.Forms.TextBox txbSearchCategory;
         private System.Windows.Forms.Button btnCancelCategory;

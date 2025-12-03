@@ -1,6 +1,7 @@
 ﻿using Lab_8.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -29,7 +30,8 @@ namespace Lab_8.Services
         public async Task<PaginatedResult<Quiz>> GetListQuiz(
             int pageSize = 100,
             int pageNumber = 1,
-            string name = null)
+            string name = null,
+            List<int> categoryIds = null)
         {
             using (var context = new QuizDBContext())
             {
@@ -39,12 +41,15 @@ namespace Lab_8.Services
 
                 if (!string.IsNullOrEmpty(name))
                 {
-                    query = query.Where(a =>
-                        a.Name.ToLower().Contains(name.ToLower()) ||
-                        a.Category.Name.ToLower().Contains(name.ToLower()) ||
-                        a.Difficulty.ToLower().Contains(name.ToLower())
+                    query = query.Where(q =>
+                        q.Name.ToLower().Contains(name.ToLower()) ||
+                        q.Category.Name.ToLower().Contains(name.ToLower()) ||
+                        q.Difficulty.ToLower().Contains(name.ToLower())
                     );
                 }
+
+                if (categoryIds != null && categoryIds.Any())
+                    query = query.Where(q => categoryIds.Contains(q.CategoryId));
 
                 int totalCount = await query.CountAsync();
                 int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);

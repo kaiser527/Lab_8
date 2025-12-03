@@ -9,7 +9,7 @@ namespace Lab_8.Models
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(100)]
+        [Column(TypeName = "NVARCHAR(MAX)")]
         public string Name { get; set; }
 
         [Required]

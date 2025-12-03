@@ -77,7 +77,7 @@ namespace Lab_8
             this.txbUserEmail.Font = new System.Drawing.Font("Segoe UI", 11F);
             this.txbUserEmail.Location = new System.Drawing.Point(140, 65);
             this.txbUserEmail.Name = "txbUserEmail";
-            this.txbUserEmail.Size = new System.Drawing.Size(309, 32);
+            this.txbUserEmail.Size = new System.Drawing.Size(272, 32);
             this.txbUserEmail.TabIndex = 2;
             this.txbUserEmail.Text = "admin@test.com";
             // 
@@ -86,7 +86,7 @@ namespace Lab_8
             this.txbUserPassword.Font = new System.Drawing.Font("Segoe UI", 11F);
             this.txbUserPassword.Location = new System.Drawing.Point(140, 115);
             this.txbUserPassword.Name = "txbUserPassword";
-            this.txbUserPassword.Size = new System.Drawing.Size(309, 32);
+            this.txbUserPassword.Size = new System.Drawing.Size(272, 32);
             this.txbUserPassword.TabIndex = 4;
             this.txbUserPassword.Text = "123456";
             this.txbUserPassword.UseSystemPasswordChar = true;
@@ -115,7 +115,7 @@ namespace Lab_8
             this.btnExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnExit.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnExit.ForeColor = System.Drawing.Color.White;
-            this.btnExit.Location = new System.Drawing.Point(347, 185);
+            this.btnExit.Location = new System.Drawing.Point(311, 186);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(100, 35);
             this.btnExit.TabIndex = 6;
@@ -139,7 +139,7 @@ namespace Lab_8
             this.panelMain.Location = new System.Drawing.Point(0, 0);
             this.panelMain.Name = "panelMain";
             this.panelMain.Padding = new System.Windows.Forms.Padding(20);
-            this.panelMain.Size = new System.Drawing.Size(494, 243);
+            this.panelMain.Size = new System.Drawing.Size(458, 243);
             this.panelMain.TabIndex = 0;
             // 
             // label1
@@ -148,11 +148,12 @@ namespace Lab_8
             this.label1.Cursor = System.Windows.Forms.Cursors.Hand;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(120)))), ((int)(((byte)(215)))));
-            this.label1.Location = new System.Drawing.Point(341, 154);
+            this.label1.Location = new System.Drawing.Point(358, 154);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(135, 23);
+            this.label1.Size = new System.Drawing.Size(71, 23);
             this.label1.TabIndex = 7;
-            this.label1.Text = "Forgot Password";
+            this.label1.Text = "Register";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // chkRememberMe
             // 
@@ -169,7 +170,7 @@ namespace Lab_8
             // 
             this.AcceptButton = this.btnLogin;
             this.CancelButton = this.btnExit;
-            this.ClientSize = new System.Drawing.Size(494, 243);
+            this.ClientSize = new System.Drawing.Size(458, 243);
             this.Controls.Add(this.panelMain);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;

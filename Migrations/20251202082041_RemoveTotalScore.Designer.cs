@@ -4,14 +4,16 @@ using Lab_8.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Lab_8.Migrations
 {
     [DbContext(typeof(QuizDBContext))]
-    partial class QuizDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251202082041_RemoveTotalScore")]
+    partial class RemoveTotalScore
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,7 +33,8 @@ namespace Lab_8.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR(MAX)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<int>("QuestionId")
                         .HasColumnType("int");
@@ -131,7 +134,7 @@ namespace Lab_8.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR(MAX)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("QuizId")
                         .HasColumnType("int");
@@ -214,6 +217,13 @@ namespace Lab_8.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CodeExpire")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CodeId")
+                        .HasColumnType("nvarchar(6)")
+                        .HasMaxLength(6);
 
                     b.Property<string>("Email")
                         .IsRequired()

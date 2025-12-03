@@ -22,11 +22,18 @@ namespace Lab_8.Forms
         private DateTime? _timeStart = null;
         private DateTime? _timeFinish = null;
 
+        private readonly bool _isPlaceholderApplied = false;
+
+        private bool _formReady = false;
+
+        private readonly List<int> _categoryIds = new List<int>();    
+
         public Home()
         {
             InitializeComponent();
             ApplyRoleBase();
             StylePanels();
+            UIStyle.ApplyPlaceholder(txbSearchQuiz, "Search quiz", ref _isPlaceholderApplied);
             Load += load_Data;
         }
 
@@ -46,11 +53,129 @@ namespace Lab_8.Forms
                 .Select(rp => rp.Permission.Name)
                 .ToList();
         }
+
+        public async Task LoadFilter()
+        {
+            // Fetch categories
+            var result = await CategoryService.Instance.GetListCategory(100, 1, null);
+            if (result == null || result.Items == null) return;
+
+            quizFilterPanel.Controls.Clear();
+            quizFilterPanel.AutoScroll = true;
+            quizFilterPanel.BackColor = Color.WhiteSmoke;
+
+            // --- Add a title ---
+            Label title = new Label
+            {
+                Text = "Categories",
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                ForeColor = Color.FromArgb(0, 120, 215),
+                AutoSize = false,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Width = quizFilterPanel.Width - 40,
+                Height = 40,
+                Location = new Point(20, 10)
+            };
+            quizFilterPanel.Controls.Add(title);
+
+            // --- Layout variables ---
+            int xStart = 23;
+            int y = 60; // start below title
+            int spacingX = 30;
+            int spacingY = 15;
+            int col = 0;
+
+            int cbWidth = (quizFilterPanel.Width - xStart * 2 - spacingX) / 2;
+            int cbHeight = 50; // height for a checkbox
+
+            foreach (var category in result.Items.Where(c => c.IsActive))
+            {
+                // Panel container
+                Panel cbContainer = new Panel
+                {
+                    Width = cbWidth + 20,
+                    Height = cbHeight,
+                    Location = new Point(xStart + (cbWidth + spacingX) * col - 10, y),
+                    BackColor = Color.White,
+                };
+
+                UIStyle.RoundPanel(cbContainer, 15);
+
+                // Checkbox
+                CheckBox cb = new CheckBox
+                {
+                    Text = category.Name,
+                    Tag = category,
+                    Font = new Font("Segoe UI", 10.8f, FontStyle.Regular),
+                    AutoSize = true, // let Windows handle checkbox + text size
+                    Location = new Point(5, (cbContainer.Height - 20) / 2 - 3), // vertically centered
+                };
+
+                // Hover effect on panel
+                cbContainer.MouseEnter += (s, e) => cbContainer.BackColor = Color.AliceBlue;
+                cbContainer.MouseLeave += (s, e) => cbContainer.BackColor = Color.White;
+
+                cb.CheckedChanged += Checkbox_CheckedChanged;
+
+                cbContainer.Controls.Add(cb);
+                quizFilterPanel.Controls.Add(cbContainer);
+
+                col++;
+                if (col >= 2)
+                {
+                    col = 0;
+                    y += cbHeight + spacingY;
+                }
+            }
+
+            // --- Reset Categories Button ---
+            Button btnResetCategories = new Button
+            {
+                Text = "Reset Categories",
+                Width = cbWidth * 2 + spacingX, // span across two columns
+                Height = 35,
+                Top = 260, // some extra spacing
+                Left = xStart,
+                BackColor = Color.FromArgb(220, 53, 69), // Bootstrap-like red
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                Cursor = Cursors.Hand
+            };
+
+            UIStyle.ModernUIButton(btnResetCategories, Color.FromArgb(200, 35, 51), Color.FromArgb(220, 53, 69));
+
+            // Click event: reset selected categories
+            btnResetCategories.Click += async (s, e) =>
+            {
+                _categoryIds.Clear();
+
+                // Temporarily remove CheckedChanged events
+                foreach (Panel panel in quizFilterPanel.Controls.OfType<Panel>())
+                {
+                    if (panel.Controls[0] is CheckBox cbx)
+                    {
+                        cbx.CheckedChanged -= Checkbox_CheckedChanged; // detach handler
+                        cbx.Checked = false;
+                        cbx.CheckedChanged += Checkbox_CheckedChanged; // reattach handler
+                    }
+                }
+
+                _currentPageQuiz = 1;
+                await LoadQuiz();
+            };
+            quizFilterPanel.Controls.Add(btnResetCategories);
+        }
+
         public async Task LoadQuiz()
         {
             ShowQuizSkeletonLoader(_pageSizeQuiz);
 
-            var result = await QuizService.Instance.GetListQuiz(_pageSizeQuiz, _currentPageQuiz, null);
+            var result = await QuizService.Instance.GetListQuiz(
+                _pageSizeQuiz, 
+                _currentPageQuiz,
+                txbSearchQuiz.Text == "Search quiz" ? null : txbSearchQuiz.Text,
+                _categoryIds);
 
             Helper.StopShimmerAnimation();
 
@@ -84,6 +209,8 @@ namespace Lab_8.Forms
             UIStyle.RoundPanel(historyPanel, 15);
             UIStyle.RoundPanel(flpQuiz, 15);
             UIStyle.RoundPanel(paginatePanelHistory, 15);
+            UIStyle.RoundPanel(searchQuizPanel, 15);
+            UIStyle.RoundPanel(quizFilterPanel, 15);
         }
 
         public async Task<int> ShowHistoryAsync(int quizId)
@@ -135,7 +262,7 @@ namespace Lab_8.Forms
             {
                 Width = flow.ClientSize.Width - 30,
                 Height = 20,
-                Margin = new Padding(0, 0, 0, 4) // keep your margin
+                Margin = new Padding(0, 0, 0, 4)
             };
 
             DateTimePicker dtpStart = new DateTimePicker
@@ -283,6 +410,14 @@ namespace Lab_8.Forms
                     }
                 };
 
+                item.Click += (s, e) =>
+                {
+                    if (!h.IsFinish) return;
+
+                    UserQuiz quizForm = new UserQuiz(quizId, h.Id, this, true); // history mode
+                    quizForm.ShowDialog();                 
+                };
+
                 // Labels
                 Label lblDate = new Label
                 {
@@ -294,9 +429,41 @@ namespace Lab_8.Forms
                     Top = 10
                 };
 
+                var quiz = await QuizService.Instance.GetQuizById(quizId);
+                var userAnswers = await UserService.Instance.GetUserAnswersByHistory(h.Id);
+
+                // Count correct answers
+                int correctCount = 0;
+                int totalCount = 0; 
+
+                if (h.IsFinish)
+                {
+                    foreach (var question in quiz.Questions)
+                    {
+                        var correctAnswer = question.Answers?.FirstOrDefault(a => a.IsCorrect);
+
+                        if (correctAnswer == null)
+                            continue;
+
+                        totalCount++; 
+
+                        // Get user's answer
+                        var userAnswer = userAnswers
+                            .FirstOrDefault(ua => ua.Answer != null && ua.Answer.QuestionId == question.Id)
+                            ?.Answer;
+
+                        if (userAnswer != null && userAnswer.Id == correctAnswer.Id)
+                            correctCount++;
+                    }
+                }
+
+                // Calculate percentage
+                double percentage = totalCount > 0 ? (double)correctCount / totalCount * 100 : 0;
+
+                // Create label
                 Label lblScore = new Label
                 {
-                    Text = $"⭐ Score: { Math.Round(h.TotalScore, 2) }",
+                    Text = $"⭐ Score: {Math.Round(percentage, 2)}%",
                     AutoSize = true,
                     Font = new Font("Segoe UI", 9, FontStyle.Bold),
                     ForeColor = Color.FromArgb(0, 120, 215),
@@ -466,8 +633,7 @@ namespace Lab_8.Forms
                         UserId = user.Id,
                         QuizId = quiz.Id,
                         TimeStart = DateTime.Now,
-                        IsFinish = false,
-                        TotalScore = 0
+                        IsFinish = false
                     };
 
                     await HistoryService.Instance.CreateUserHistory(historyToUse);
@@ -686,6 +852,9 @@ namespace Lab_8.Forms
             if (permissionNames.Contains("View Quiz"))
             {
                 await LoadQuiz();
+                _formReady = true;
+
+                await LoadFilter();
             }
 
             var firstHistoryId = await HistoryService.Instance.GetFirstHistoryId();
@@ -715,6 +884,32 @@ namespace Lab_8.Forms
             var login = new Login();
             login.ShowDialog();
             Close();
+        }
+
+        private async void txbSearchQuiz_TextChanged(object sender, EventArgs e)
+        {
+            if (!_formReady) return;
+
+            await LoadQuiz();
+        }
+
+        private async void Checkbox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!(sender is CheckBox cb)) return;
+
+            var id = (cb.Tag as Category).Id;
+            if (cb.Checked)
+            {
+                if (!_categoryIds.Contains(id))
+                    _categoryIds.Add(id);
+            }
+            else
+            {
+                _categoryIds.Remove(id);
+            }
+
+            _currentPageQuiz = 1;
+            await LoadQuiz();
         }
         #endregion
     }

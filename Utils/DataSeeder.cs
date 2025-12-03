@@ -257,7 +257,6 @@ namespace Lab_8.Utils
                     IsFinish = true,
                     TimeStart = DateTime.Now.AddMinutes(-5),
                     TimeFinish = DateTime.Now,
-                    TotalScore = 33.33
                 };
 
                 context.Histories.Add(history);

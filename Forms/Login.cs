@@ -106,6 +106,13 @@ namespace Lab_8
                 txbUserPassword.UseSystemPasswordChar = true;
             }
         }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+            Hide();
+            Register register = new Register();
+            register.ShowDialog();
+        }
         #endregion
     }
 }

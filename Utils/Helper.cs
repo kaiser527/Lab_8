@@ -14,12 +14,15 @@ namespace Lab_8.Utils
         private static Timer shimmerTimer;
         private static int shimmerOffset = 0;
 
-        public static void StartShimmerAnimation(FlowLayoutPanel container)
+        public static void StartShimmerAnimation(Control container)
         {
+            if (container == null) return;
+
             shimmerTimer = new Timer
             {
-                Interval = 50 // adjust speed
+                Interval = 50 
             };
+
             shimmerTimer.Tick += (s, e) =>
             {
                 shimmerOffset += 5;
@@ -32,15 +35,21 @@ namespace Lab_8.Utils
                         {
                             int baseColor = 200;
                             int offset = (shimmerOffset + placeholder.Top) % 255;
-                            placeholder.BackColor = Color.FromArgb(
-                                baseColor + offset / 2 % 55,
-                                baseColor + offset / 2 % 55,
-                                baseColor + offset / 2 % 55
-                            );
+                            int colorValue = baseColor + (offset / 2 % 55);
+                            placeholder.BackColor = Color.FromArgb(colorValue, colorValue, colorValue);
                         }
+                    }
+
+                    if (card is Panel && card.Controls.Count == 0)
+                    {
+                        int baseColor = 200;
+                        int offset = (shimmerOffset + card.Top) % 255;
+                        int colorValue = baseColor + (offset / 2 % 55);
+                        card.BackColor = Color.FromArgb(colorValue, colorValue, colorValue);
                     }
                 }
             };
+
             shimmerTimer.Start();
         }
 
@@ -48,6 +57,17 @@ namespace Lab_8.Utils
         {
             shimmerTimer?.Stop();
             shimmerTimer = null;
+        }
+
+        public static Image ByteArrayToImage(byte[] bytes)
+        {
+            if (bytes == null || bytes.Length == 0)
+                return null;
+
+            using (var ms = new MemoryStream(bytes))
+            {
+                return Image.FromStream(ms);
+            }
         }
 
         public static byte[] UploadImage(OpenFileDialog openFileDialog, PictureBox pictureBox = null)
@@ -132,14 +152,6 @@ namespace Lab_8.Utils
             if (q?.WaveOut != null && q.WaveOut.PlaybackState == PlaybackState.Playing)
             {
                 q.WaveOut.Pause();  
-            }
-        }
-
-        public static void ResumeAudio(Question q)
-        {
-            if (q?.WaveOut != null && q.WaveOut.PlaybackState == PlaybackState.Paused)
-            {
-                q.WaveOut.Play();
             }
         }
 

@@ -4,14 +4,16 @@ using Lab_8.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Lab_8.Migrations
 {
     [DbContext(typeof(QuizDBContext))]
-    partial class QuizDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251203022952_ChangeToTextForQuestionAndAnswer")]
+    partial class ChangeToTextForQuestionAndAnswer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -214,6 +216,13 @@ namespace Lab_8.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CodeExpire")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CodeId")
+                        .HasColumnType("nvarchar(6)")
+                        .HasMaxLength(6);
 
                     b.Property<string>("Email")
                         .IsRequired()

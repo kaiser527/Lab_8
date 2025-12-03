@@ -30,11 +30,6 @@ namespace Lab_8.Models
         [ForeignKey("RoleId")]
         public Role Role { get; set; }
 
-        [MaxLength(6)]
-        public string CodeId { get; set; }
-
-        public DateTime CodeExpire { get; set; }
-
         public ICollection<History> Histories { get; set; } = new List<History>();
 
         public ICollection<UserAnswer> UserAnswers { get; set; } = new List<UserAnswer>();

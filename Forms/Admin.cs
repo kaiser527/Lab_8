@@ -304,13 +304,13 @@ namespace Lab_8.Forms
 
                     yOff += cb.Height + 4;
 
-                    EventHandler eh = (s, e) =>
+                    void eh(object s, EventArgs e)
                     {
                         bool allChecked = permissionPanel.Controls.OfType<CheckBox>().All(c => c.Checked);
                         moduleCheckBox.CheckedChanged -= ModuleCheckHandler;
                         moduleCheckBox.Checked = allChecked;
                         moduleCheckBox.CheckedChanged += ModuleCheckHandler;
-                    };
+                    }
 
                     cb.CheckedChanged += eh;
                     permHandlers.Add(eh);
@@ -600,7 +600,7 @@ namespace Lab_8.Forms
                 {
                     Text = "Upload Audio",
                     Left = pic.Right + 10,
-                    Top = pic.Top,
+                    Top = pic.Top + 37,
                     Width = 100,
                     Height = 27
                 };
@@ -633,7 +633,7 @@ namespace Lab_8.Forms
                     {
                         Text = "▶",
                         Left = btnUploadAudio.Right + 5,
-                        Top = pic.Top,
+                        Top = pic.Top + 37,
                         Width = 100,
                         Height = 27
                     };
@@ -643,7 +643,7 @@ namespace Lab_8.Forms
                         currentQuestion = q;
                         if (q.WaveOut != null && q.WaveOut.PlaybackState == PlaybackState.Playing)
                         {
-                            Helper.PauseAudio(q);   
+                            Helper.PauseAudio(q);
                             btnPlayPause.Text = "▶";
                         }
                         else
@@ -653,6 +653,25 @@ namespace Lab_8.Forms
                         }
                     };
                     questionPanel.Controls.Add(btnPlayPause);
+
+                    // --- Remove Audio Button ---
+                    var btnRemoveAudio = new Button
+                    {
+                        Text = "Remove Audio",
+                        Left = btnPlayPause.Right + 5,
+                        Top = pic.Top + 37,
+                        Width = 100,
+                        Height = 27
+                    };
+                    btnRemoveAudio.Click += (s, e) =>
+                    {
+                        Helper.StopAudio(q);
+                        q.Audio = null;
+                        q.Reader = null;
+                        q.WaveOut = null;
+                        RenderQuestionList();
+                    };
+                    questionPanel.Controls.Add(btnRemoveAudio);
                 }
 
                 // --- GroupBox for Answers ---
@@ -1240,6 +1259,8 @@ namespace Lab_8.Forms
             await LoadDataIntoCombobox(
                 cbQuizCategory,
                 () => CategoryService.Instance.GetListCategory(100, 1, null));
+
+            await _home.LoadFilter();
         }
 
         private void ClearAllCheckoxPermission()

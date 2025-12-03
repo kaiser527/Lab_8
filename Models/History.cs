@@ -25,9 +25,6 @@ namespace Lab_8.Models
         [Required]
         public DateTime TimeFinish { get; set; }
 
-        [Required]
-        public double TotalScore { get; set; }
-
         [ForeignKey("QuizId")]
         public Quiz Quiz { get; set; }
 

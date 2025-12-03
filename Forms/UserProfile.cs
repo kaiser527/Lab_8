@@ -1,4 +1,5 @@
 ﻿using Lab_8.DTO;
+using Lab_8.Models;
 using Lab_8.Services;
 using Lab_8.Utils;
 using System;
@@ -55,14 +56,11 @@ namespace Lab_8.Forms
             // Load profile image if exists
             if (user.Image != null && user.Image.Length > 0)
             {
-                userImageBytes = user.Image;
+                var userImageBytes = Helper.ByteArrayToImage(user.Image);
 
-                using (var ms = new MemoryStream(user.Image))
-                {
-                    btnUploadUserProfile.BackgroundImage = Image.FromStream(ms);
-                    btnUploadUserProfile.BackgroundImageLayout = ImageLayout.Stretch;
-                    btnUploadUserProfile.Text = ""; // Remove '+' sign
-                }
+                btnUploadUserProfile.BackgroundImage = userImageBytes;
+                btnUploadUserProfile.BackgroundImageLayout = ImageLayout.Stretch;
+                btnUploadUserProfile.Text = ""; // Remove '+' sign
             }
         }
 
@@ -133,15 +131,11 @@ namespace Lab_8.Forms
 
                 if (userImageBytes != null)
                 {
-                    var user = UserService.Instance.User;
-                    user.Image = userImageBytes;
+                    var userImageBytesSaved = Helper.ByteArrayToImage(userImageBytes);
 
-                    using (var ms = new MemoryStream(userImageBytes))
-                    {
-                        btnUploadUserProfile.BackgroundImage = Image.FromStream(ms);
-                        btnUploadUserProfile.BackgroundImageLayout = ImageLayout.Stretch;
-                        btnUploadUserProfile.Text = "";
-                    }
+                    btnUploadUserProfile.BackgroundImage = userImageBytesSaved;
+                    btnUploadUserProfile.BackgroundImageLayout = ImageLayout.Stretch;
+                    btnUploadUserProfile.Text = "";
                 }
             }
             catch (Exception ex)

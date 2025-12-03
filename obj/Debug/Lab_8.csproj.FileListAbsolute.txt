@@ -157,3 +157,4 @@ C:\Users\Admin\source\repos\Lab_8\bin\Debug\MailKit.dll.config
 C:\Users\Admin\source\repos\Lab_8\bin\Debug\MimeKit.pdb
 C:\Users\Admin\source\repos\Lab_8\bin\Debug\MimeKit.xml
 C:\Users\Admin\source\repos\Lab_8\bin\Debug\System.Formats.Asn1.xml
+C:\Users\Admin\source\repos\Lab_8\obj\Debug\Lab_8.Forms.Register.resources

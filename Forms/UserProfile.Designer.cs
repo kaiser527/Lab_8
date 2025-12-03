@@ -326,8 +326,8 @@
             this.Controls.Add(this.panel7);
             this.Controls.Add(this.panel6);
             this.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Margin = new System.Windows.Forms.Padding(4);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.Name = "UserProfile";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
