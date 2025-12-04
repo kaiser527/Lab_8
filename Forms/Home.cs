@@ -56,8 +56,12 @@ namespace Lab_8.Forms
 
         public async Task LoadFilter()
         {
-            // Fetch categories
+            ShowFilterSkeleton();
+
             var result = await CategoryService.Instance.GetListCategory(100, 1, null);
+
+            Helper.StopShimmerAnimation();
+
             if (result == null || result.Items == null) return;
 
             quizFilterPanel.Controls.Clear();
@@ -837,6 +841,77 @@ namespace Lab_8.Forms
 
             // Optional: start shimmer animation
             Helper.StartShimmerAnimation(flpQuiz);
+        }
+
+        private void ShowFilterSkeleton()
+        {
+            quizFilterPanel.Controls.Clear();
+            quizFilterPanel.AutoScroll = true;
+            quizFilterPanel.BackColor = Color.WhiteSmoke;
+
+            // --- Title skeleton ---
+            Panel titleSkel = new Panel
+            {
+                Width = quizFilterPanel.Width - 40,
+                Height = 40,
+                Location = new Point(20, 10),
+                BackColor = Color.Gainsboro
+            };
+            quizFilterPanel.Controls.Add(titleSkel);
+
+            // --- Checkbox skeletons (2 columns × 4 rows = 8 placeholders) ---
+            int xStart = 23;
+            int y = 80;
+            int spacingX = 30;
+            int spacingY = 15;
+            int col = 0;
+
+            int cbWidth = (quizFilterPanel.Width - xStart * 2 - spacingX) / 2;
+            int cbHeight = 50;
+
+            for (int i = 0; i < 8; i++)
+            {
+                Panel cbSkeleton = new Panel
+                {
+                    Width = cbWidth + 20,
+                    Height = cbHeight,
+                    Location = new Point(xStart + (cbWidth + spacingX) * col - 10, y),
+                    BackColor = Color.Gainsboro
+                };
+
+                // Placeholder inner bar
+                Panel bar = new Panel
+                {
+                    Width = cbWidth - 20,
+                    Height = 12,
+                    Left = 20,
+                    Top = (cbHeight - 12) / 2,
+                    BackColor = Color.LightGray
+                };
+                cbSkeleton.Controls.Add(bar);
+
+                quizFilterPanel.Controls.Add(cbSkeleton);
+
+                col++;
+                if (col >= 2)
+                {
+                    col = 0;
+                    y += cbHeight + spacingY;
+                }
+            }
+
+            // --- Reset button placeholder ---
+            Panel resetBtnSkel = new Panel
+            {
+                Width = cbWidth * 2 + spacingX,
+                Height = 35,
+                Location = new Point(xStart, y + 20),
+                BackColor = Color.Silver
+            };
+            quizFilterPanel.Controls.Add(resetBtnSkel);
+
+            // Start shimmer
+            Helper.StartShimmerAnimation(quizFilterPanel);
         }
         #endregion
 

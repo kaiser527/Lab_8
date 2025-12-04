@@ -99,6 +99,13 @@ namespace Lab_8.Forms
             Login login = new Login();
             login.ShowDialog(); 
         }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Hide();
+            Login login = new Login();
+            login.ShowDialog();
+        }
         #endregion
     }
 }

@@ -163,6 +163,7 @@ namespace Lab_8.Forms
             this.btnExit.TabIndex = 10;
             this.btnExit.Text = "Exit";
             this.btnExit.UseVisualStyleBackColor = false;
+            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
             // lblLogin
             // 
