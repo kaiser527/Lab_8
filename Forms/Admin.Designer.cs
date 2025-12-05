@@ -144,6 +144,7 @@
             this.categoryNamePanel = new System.Windows.Forms.Panel();
             this.txbCategoryName = new System.Windows.Forms.TextBox();
             this.label17 = new System.Windows.Forms.Label();
+            this.quizRichText = new System.Windows.Forms.RichTextBox();
             this.tpQuestionAnswer.SuspendLayout();
             this.panel7.SuspendLayout();
             this.listQuizPanel.SuspendLayout();
@@ -198,6 +199,7 @@
             // 
             // tpQuestionAnswer
             // 
+            this.tpQuestionAnswer.Controls.Add(this.quizRichText);
             this.tpQuestionAnswer.Controls.Add(this.panel8);
             this.tpQuestionAnswer.Controls.Add(this.label9);
             this.tpQuestionAnswer.Controls.Add(this.panel7);
@@ -212,16 +214,16 @@
             // 
             this.panel8.AutoScroll = true;
             this.panel8.BackColor = System.Drawing.Color.White;
-            this.panel8.Location = new System.Drawing.Point(6, 135);
+            this.panel8.Location = new System.Drawing.Point(3, 157);
             this.panel8.Name = "panel8";
-            this.panel8.Size = new System.Drawing.Size(1081, 473);
+            this.panel8.Size = new System.Drawing.Size(1088, 455);
             this.panel8.TabIndex = 6;
             // 
             // label9
             // 
             this.label9.AutoSize = true;
             this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.Location = new System.Drawing.Point(57, 93);
+            this.label9.Location = new System.Drawing.Point(57, 102);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(168, 25);
             this.label9.TabIndex = 3;
@@ -233,7 +235,7 @@
             this.panel7.Controls.Add(this.listQuizPanel);
             this.panel7.Location = new System.Drawing.Point(6, 6);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(1081, 84);
+            this.panel7.Size = new System.Drawing.Size(634, 84);
             this.panel7.TabIndex = 5;
             // 
             // btnUpsertQuizQA
@@ -241,7 +243,7 @@
             this.btnUpsertQuizQA.BackColor = System.Drawing.Color.LightGray;
             this.btnUpsertQuizQA.Location = new System.Drawing.Point(486, 21);
             this.btnUpsertQuizQA.Name = "btnUpsertQuizQA";
-            this.btnUpsertQuizQA.Size = new System.Drawing.Size(142, 41);
+            this.btnUpsertQuizQA.Size = new System.Drawing.Size(145, 41);
             this.btnUpsertQuizQA.TabIndex = 6;
             this.btnUpsertQuizQA.Text = "Update";
             this.btnUpsertQuizQA.UseVisualStyleBackColor = false;
@@ -1385,6 +1387,14 @@
             this.label17.TabIndex = 0;
             this.label17.Text = "Name:";
             // 
+            // quizRichText
+            // 
+            this.quizRichText.Location = new System.Drawing.Point(646, 6);
+            this.quizRichText.Name = "quizRichText";
+            this.quizRichText.Size = new System.Drawing.Size(397, 145);
+            this.quizRichText.TabIndex = 7;
+            this.quizRichText.Text = "";
+            // 
             // Admin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -1582,5 +1592,6 @@
         private System.Windows.Forms.Panel categoryIsActivePanel;
         private System.Windows.Forms.ComboBox cbCategoryIsActive;
         private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.RichTextBox quizRichText;
     }
 }

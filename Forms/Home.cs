@@ -418,7 +418,7 @@ namespace Lab_8.Forms
                 {
                     if (!h.IsFinish) return;
 
-                    UserQuiz quizForm = new UserQuiz(quizId, h.Id, this, true); // history mode
+                    UserQuiz quizForm = new UserQuiz(quizId, h.Id, h.Quiz.Category.Name ,this, true); // history mode
                     quizForm.ShowDialog();                 
                 };
 
@@ -637,7 +637,7 @@ namespace Lab_8.Forms
                         UserId = user.Id,
                         QuizId = quiz.Id,
                         TimeStart = DateTime.Now,
-                        IsFinish = false
+                        IsFinish = false,
                     };
 
                     await HistoryService.Instance.CreateUserHistory(historyToUse);
@@ -652,7 +652,9 @@ namespace Lab_8.Forms
                     historyToUse = latestHistory;
                 }
 
-                UserQuiz quizForm = new UserQuiz(quiz.Id, historyToUse.Id, this);
+                historyToUse.Quiz = quiz;
+
+                UserQuiz quizForm = new UserQuiz(quiz.Id, historyToUse.Id, historyToUse.Quiz.Category.Name, this);
                 quizForm.ShowDialog();
 
                 await HandleClickQuiz(quiz.Id);

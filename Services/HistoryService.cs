@@ -34,7 +34,10 @@ namespace Lab_8.Services
         {
             using (var context = new QuizDBContext())
             {
-                var query = context.Histories.Where(h => h.QuizId == quizId && h.UserId == userId);
+                var query = context.Histories
+                    .Include(h => h.Quiz)
+                        .ThenInclude(q => q.Category)
+                    .Where(h => h.QuizId == quizId && h.UserId == userId);
 
                 if (timeStart.HasValue)
                 {

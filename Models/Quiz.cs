@@ -13,6 +13,9 @@ namespace Lab_8.Models
         [MaxLength(100)]
         public string Name { get; set; }
 
+        [Column(TypeName = "NVARCHAR(MAX)")]
+        public string Text { get; set; }
+
         [Required]
         public int CategoryId { get; set; }
 

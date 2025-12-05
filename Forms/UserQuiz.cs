@@ -19,23 +19,28 @@ namespace Lab_8
 
         private readonly int _quizId;
         private readonly int _historyId;
+        private readonly string _category;
 
         private Quiz _quiz;
         private int _currentQuestionIndex = 0;
         private readonly Dictionary<int, Answer> _userSelectedAnswers = new Dictionary<int, Answer>();
         private bool _isQuizFinished = false;
         private readonly bool _isHistoryView;
+        private Question _currentQuestion;
 
-        public UserQuiz(int quizId, int historyId, Home home, bool isHistoryView = false)
+        public UserQuiz(int quizId, int historyId, string category, Home home, bool isHistoryView = false)
         {
             InitializeComponent();
             _quizId = quizId;
             _historyId = historyId;
             _isHistoryView = isHistoryView;
             _home = home;
+            _category = category;
             StylePanels();
 
             Load += UserQuiz_Load;
+
+            FormClosing += (s, e) => Helper.StopAudio(_currentQuestion);
         }
 
         private void StylePanels()
@@ -50,6 +55,11 @@ namespace Lab_8
             ShowSkeletonLoading();
 
             _quiz = await QuizService.Instance.GetQuizById(_quizId);
+
+            if (_category == "Reading")
+            {
+                CreateReadingPanel(_quiz.Text);
+            }
 
             Helper.StopShimmerAnimation();
 
@@ -163,12 +173,22 @@ namespace Lab_8
         #region Display Question
         private void DisplayQuestion(int index)
         {
-            questionsPanel.Controls.Clear();
+            if (_category != "Reading")
+                questionsPanel.Controls.Clear();
+            else
+            {
+                // Clear all except reading panel
+                for (int i = questionsPanel.Controls.Count - 1; i >= 0; i--)
+                {
+                    if (questionsPanel.Controls[i] != readingPanel)
+                        questionsPanel.Controls.RemoveAt(i);
+                }
+            }
             if (_quiz?.Questions == null || index < 0 || index >= _quiz.Questions.Count)
                 return;
 
             var question = _quiz.Questions.ToList()[index];
-            int y = 15;
+            int y = (_category == "Reading") ? 222 : 15;
             int marginLeft = 15;
             bool readOnly = _isHistoryView || _isQuizFinished;
 
@@ -181,7 +201,7 @@ namespace Lab_8
                     SizeMode = PictureBoxSizeMode.Zoom,
                     Location = new Point(marginLeft, y),
                     Width = questionsPanel.Width - 2 * marginLeft,
-                    Height = 150,
+                    Height = 165,
                     BorderStyle = BorderStyle.FixedSingle
                 };
                 questionsPanel.Controls.Add(pic);
@@ -215,6 +235,7 @@ namespace Lab_8
 
                 btnPlayPause.Click += (s, e) =>
                 {
+                    _currentQuestion = question;
                     if (question.WaveOut != null && question.WaveOut.PlaybackState == PlaybackState.Playing)
                     {
                         Helper.PauseAudio(question);
@@ -268,8 +289,7 @@ namespace Lab_8
 
             AddNavigationButtons(index);
 
-            if (readOnly)
-                ShowCorrectAnswer(index);
+            if (readOnly) ShowCorrectAnswer(question);
         }
         #endregion
 
@@ -446,31 +466,34 @@ namespace Lab_8
         #endregion
 
         #region Show Correct Answer
-        private void ShowCorrectAnswer(int index)
+        private void ShowCorrectAnswer(Question question)
         {
-            if (_quiz == null || _quiz.Questions == null || index < 0 || index >= _quiz.Questions.Count)
-                return;
-
-            var question = _quiz.Questions.ToList()[index];
-
-            if (question.Answers == null)
-                return;
-
-            var correctAnswer = question.Answers.FirstOrDefault(a => a.IsCorrect);
-            if (correctAnswer == null)
-                return; // no correct answer found
-
-            Label lblCorrect = new Label
+            var correct = question.Answers.FirstOrDefault(a => a.IsCorrect);
+            foreach (Control ctrl in questionsPanel.Controls)
             {
-                Text = "Correct Answer: " + correctAnswer.Name,
-                Font = new Font("Segoe UI", 12, FontStyle.Bold),
-                ForeColor = Color.Green,
-                AutoSize = true,
-                Location = new Point(20, questionsPanel.Height - 85)
-            };
+                if (ctrl is RadioButton rb)
+                {
+                    var ans = (Answer)rb.Tag;
+                    if (ans.Id == correct?.Id)
+                    {
+                        rb.BackColor = Color.LightGreen;
+                        rb.ForeColor = Color.Black;
+                    }
+                    else
+                    {
+                        rb.BackColor = Color.White;
+                        rb.ForeColor = Color.Black;
+                    }
 
-            questionsPanel.Controls.Add(lblCorrect);
-            lblCorrect.BringToFront();
+                    // If wrong was chosen, mark it red
+                    if (_userSelectedAnswers.TryGetValue(question.Id, out var selected) &&
+                        selected.Id == ans.Id && ans.Id != correct?.Id)
+                    {
+                        rb.BackColor = Color.LightCoral;
+                        rb.ForeColor = Color.White;
+                    }
+                }
+            }
         }
         #endregion
 
@@ -493,6 +516,35 @@ namespace Lab_8
             HighlightCurrentQuestionButton();
         }
         #endregion
+
+        private void CreateReadingPanel(string paragraphText)
+        {
+            readingPanel = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 200,
+                Padding = new Padding(10),
+                BackColor = Color.White,
+            };
+
+            readingParagraphBox = new RichTextBox
+            {
+                Dock = DockStyle.Fill,
+                Text = paragraphText,
+                ReadOnly = true,
+                BorderStyle = BorderStyle.FixedSingle,
+                Font = new Font("Segoe UI", 11, FontStyle.Regular),
+                BackColor = Color.White,
+                ScrollBars = RichTextBoxScrollBars.Vertical
+            };
+
+            readingPanel.Controls.Add(readingParagraphBox);
+
+            // Insert before question content
+            questionsPanel.Controls.Add(readingPanel);
+            readingPanel.BringToFront();
+        }
+
 
         #region Skeleton
         private Panel CreateSkeletonCard()

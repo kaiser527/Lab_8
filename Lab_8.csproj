@@ -320,6 +320,14 @@
     <Compile Include="Migrations\20251203084150_RemoveCodeIdCodeExpireFromUser.Designer.cs">
       <DependentUpon>20251203084150_RemoveCodeIdCodeExpireFromUser.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20251204104846_AddQuizContent.cs" />
+    <Compile Include="Migrations\20251204104846_AddQuizContent.Designer.cs">
+      <DependentUpon>20251204104846_AddQuizContent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20251204111717_AddQuizText.cs" />
+    <Compile Include="Migrations\20251204111717_AddQuizText.Designer.cs">
+      <DependentUpon>20251204111717_AddQuizText.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\QuizDBContextModelSnapshot.cs" />
     <Compile Include="Models\Answer.cs" />
     <Compile Include="Models\Category.cs" />

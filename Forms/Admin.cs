@@ -513,8 +513,99 @@ namespace Lab_8.Forms
             RenderQuestionList();
         }
 
+        private void ShowQuestionListSkeleton(int count = 3)
+        {
+            panel8.Controls.Clear();
+            panel8.AutoScroll = true;
+
+            // Container
+            FlowLayoutPanel flow = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                FlowDirection = FlowDirection.TopDown,
+                AutoScroll = true,
+                WrapContents = false,
+                Padding = new Padding(10)
+            };
+            panel8.Controls.Add(flow);
+
+            for (int i = 0; i < count; i++)
+            {
+                Panel skel = new Panel
+                {
+                    Width = panel8.Width - 40,
+                    Height = 260,
+                    BackColor = Color.WhiteSmoke,
+                    Margin = new Padding(10)
+                };
+
+                // Question bar
+                skel.Controls.Add(new Panel
+                {
+                    Left = 10,
+                    Top = 10,
+                    Width = skel.Width - 40,
+                    Height = 25,
+                    BackColor = Color.Gainsboro
+                });
+
+                // Image placeholder
+                skel.Controls.Add(new Panel
+                {
+                    Left = 10,
+                    Top = 50,
+                    Width = 160,
+                    Height = 100,
+                    BackColor = Color.Gainsboro
+                });
+
+                // Audio button placeholder
+                skel.Controls.Add(new Panel
+                {
+                    Left = 180,
+                    Top = 50,
+                    Width = 100,
+                    Height = 25,
+                    BackColor = Color.LightGray
+                });
+
+                // Answers group box
+                Panel answersBox = new Panel
+                {
+                    Left = 10,
+                    Top = 160,
+                    Width = skel.Width - 40,
+                    Height = 90,
+                    BackColor = Color.Gainsboro
+                };
+                skel.Controls.Add(answersBox);
+
+                // 3 answer rows
+                int y = 10;
+                for (int a = 0; a < 3; a++)
+                {
+                    answersBox.Controls.Add(new Panel
+                    {
+                        Left = 20,
+                        Top = y,
+                        Width = answersBox.Width - 40,
+                        Height = 18,
+                        BackColor = Color.LightGray
+                    });
+                    y += 25;
+                }
+
+                flow.Controls.Add(skel);
+            }
+
+            // start shimmer
+            Helper.StartShimmerAnimation(flow);
+        }
+
         private void RenderQuestionList()
         {
+            Point scrollPos = panel8.AutoScrollPosition;
+
             panel8.Controls.Clear();
             panel8.AutoScroll = true;
 
@@ -734,95 +825,8 @@ namespace Lab_8.Forms
                 panel8.Controls.Add(questionPanel);
                 y += questionPanel.Height + 10;
             }
-        }
 
-        private void ShowQuestionListSkeleton(int count = 3)
-        {
-            panel8.Controls.Clear();
-            panel8.AutoScroll = true;
-
-            // Container
-            FlowLayoutPanel flow = new FlowLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                FlowDirection = FlowDirection.TopDown,
-                AutoScroll = true,
-                WrapContents = false,
-                Padding = new Padding(10)
-            };
-            panel8.Controls.Add(flow);
-
-            for (int i = 0; i < count; i++)
-            {
-                Panel skel = new Panel
-                {
-                    Width = panel8.Width - 40,
-                    Height = 260,
-                    BackColor = Color.WhiteSmoke,
-                    Margin = new Padding(10)
-                };
-
-                // Question bar
-                skel.Controls.Add(new Panel
-                {
-                    Left = 10,
-                    Top = 10,
-                    Width = skel.Width - 40,
-                    Height = 25,
-                    BackColor = Color.Gainsboro
-                });
-
-                // Image placeholder
-                skel.Controls.Add(new Panel
-                {
-                    Left = 10,
-                    Top = 50,
-                    Width = 160,
-                    Height = 100,
-                    BackColor = Color.Gainsboro
-                });
-
-                // Audio button placeholder
-                skel.Controls.Add(new Panel
-                {
-                    Left = 180,
-                    Top = 50,
-                    Width = 100,
-                    Height = 25,
-                    BackColor = Color.LightGray
-                });
-
-                // Answers group box
-                Panel answersBox = new Panel
-                {
-                    Left = 10,
-                    Top = 160,
-                    Width = skel.Width - 40,
-                    Height = 90,
-                    BackColor = Color.Gainsboro
-                };
-                skel.Controls.Add(answersBox);
-
-                // 3 answer rows
-                int y = 10;
-                for (int a = 0; a < 3; a++)
-                {
-                    answersBox.Controls.Add(new Panel
-                    {
-                        Left = 20,
-                        Top = y,
-                        Width = answersBox.Width - 40,
-                        Height = 18,
-                        BackColor = Color.LightGray
-                    });
-                    y += 25;
-                }
-
-                flow.Controls.Add(skel);
-            }
-
-            // start shimmer
-            Helper.StartShimmerAnimation(flow);
+            panel8.AutoScrollPosition = new Point(Math.Abs(scrollPos.X), Math.Abs(scrollPos.Y));
         }
 
         private void AddQuestion()
@@ -1759,7 +1763,13 @@ namespace Lab_8.Forms
         private async void cbQuizName_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cbQuizName.SelectedItem is Quiz selectedQuiz)
-                await LoadQuestionsByQuizId(selectedQuiz.Id);
+            {
+                var fullQuiz = await QuizService.Instance.GetQuizById(selectedQuiz.Id);
+
+                await LoadQuestionsByQuizId(fullQuiz.Id);
+
+                quizRichText.Text = fullQuiz.Text;
+            }
         }
 
         private async void btnUpsertQuizQA_Click(object sender, EventArgs e)
@@ -1767,6 +1777,8 @@ namespace Lab_8.Forms
             if(questionList != null && questionList.Count > 0)
             {
                 await QuestionService.Instance.UpsertQuestionAnswer(questionList, selectedQuizId);
+
+                await QuizService.Instance.UpdateQuizText(selectedQuizId, quizRichText.Text);
 
                 RenderQuestionList();
             }

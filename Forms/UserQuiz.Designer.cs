@@ -1,4 +1,6 @@
-﻿namespace Lab_8
+﻿using System.Windows.Forms;
+
+namespace Lab_8
 {
     partial class UserQuiz
     {
@@ -13,6 +15,12 @@
         private System.Windows.Forms.PictureBox pbQuestion;
         private System.Windows.Forms.Panel questionsPanel;
         private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.RichTextBox readingParagraphBox;
+        private System.Windows.Forms.Panel readingPanel;
+        private System.Windows.Forms.PictureBox questionImage;
+        private System.Windows.Forms.Label questionTitle;
+        private System.Windows.Forms.Button audioButton;
+        private System.Windows.Forms.FlowLayoutPanel answersContainer;
 
         protected override void Dispose(bool disposing)
         {

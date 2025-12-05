@@ -135,6 +135,24 @@ namespace Lab_8.Services
             }
         }
 
+        public async Task UpdateQuizText(int quizId, string text = null)
+        {
+            using (var context = new QuizDBContext())
+            {
+                Quiz existingQuiz = await context.Quizzes.FindAsync(quizId);
+
+                if (existingQuiz == null)
+                {
+                    Alert.ShowAlert("Quiz is not exists", Alert.AlertType.Error);
+                    return;
+                }
+
+                existingQuiz.Text = string.IsNullOrEmpty(text) ? null : text;
+
+                await context.SaveChangesAsync();   
+            }
+        }
+
         public async Task DeleteQuiz(int quizId)
         {
             using (var context = new QuizDBContext())
