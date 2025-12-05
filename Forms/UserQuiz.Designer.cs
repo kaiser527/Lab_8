@@ -17,10 +17,6 @@ namespace Lab_8
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.RichTextBox readingParagraphBox;
         private System.Windows.Forms.Panel readingPanel;
-        private System.Windows.Forms.PictureBox questionImage;
-        private System.Windows.Forms.Label questionTitle;
-        private System.Windows.Forms.Button audioButton;
-        private System.Windows.Forms.FlowLayoutPanel answersContainer;
 
         protected override void Dispose(bool disposing)
         {

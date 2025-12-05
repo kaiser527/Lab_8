@@ -225,17 +225,22 @@ namespace Lab_8
             {
                 Button btnPlayPause = new Button
                 {
-                    Text = "▶",
-                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
                     Width = 100,
                     Height = 30,
                     Location = new Point(marginLeft, y),
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
                     Enabled = !readOnly
                 };
+
+                if (question.WaveOut != null && question.WaveOut.PlaybackState == PlaybackState.Playing)
+                    btnPlayPause.Text = "⏸";
+                else
+                    btnPlayPause.Text = "▶";
 
                 btnPlayPause.Click += (s, e) =>
                 {
                     _currentQuestion = question;
+
                     if (question.WaveOut != null && question.WaveOut.PlaybackState == PlaybackState.Playing)
                     {
                         Helper.PauseAudio(question);
