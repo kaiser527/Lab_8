@@ -395,6 +395,8 @@ namespace Lab_8
             {
                 _isQuizFinished = true;
 
+                if(_currentQuestion != null) Helper.StopAudio(_currentQuestion);
+
                 // Refresh UI first
                 HighlightCurrentQuestionButton();
                 DisplayQuestion(_currentQuestionIndex);

@@ -147,14 +147,7 @@ C:\Users\Admin\source\repos\Lab_8\bin\Debug\NAudio.Wasapi.xml
 C:\Users\Admin\source\repos\Lab_8\bin\Debug\NAudio.WinForms.xml
 C:\Users\Admin\source\repos\Lab_8\bin\Debug\NAudio.WinMM.xml
 C:\Users\Admin\source\repos\Lab_8\bin\Debug\BouncyCastle.Cryptography.dll
-C:\Users\Admin\source\repos\Lab_8\bin\Debug\MailKit.dll
-C:\Users\Admin\source\repos\Lab_8\bin\Debug\MimeKit.dll
 C:\Users\Admin\source\repos\Lab_8\bin\Debug\System.Formats.Asn1.dll
 C:\Users\Admin\source\repos\Lab_8\bin\Debug\BouncyCastle.Cryptography.xml
-C:\Users\Admin\source\repos\Lab_8\bin\Debug\MailKit.pdb
-C:\Users\Admin\source\repos\Lab_8\bin\Debug\MailKit.xml
-C:\Users\Admin\source\repos\Lab_8\bin\Debug\MailKit.dll.config
-C:\Users\Admin\source\repos\Lab_8\bin\Debug\MimeKit.pdb
-C:\Users\Admin\source\repos\Lab_8\bin\Debug\MimeKit.xml
 C:\Users\Admin\source\repos\Lab_8\bin\Debug\System.Formats.Asn1.xml
 C:\Users\Admin\source\repos\Lab_8\obj\Debug\Lab_8.Forms.Register.resources
