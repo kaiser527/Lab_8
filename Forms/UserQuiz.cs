@@ -461,8 +461,7 @@ namespace Lab_8
                     "Submit quiz successfully",
                     $"Your final score is {Math.Round(scorePercentage, 2)}%. Do you want to close the quiz?");
 
-                if (confirm)
-                    Close();
+                if (confirm) Close();
 
                 await _home.LoadQuiz();
                 await _home.ShowHistoryAsync(_quizId);
