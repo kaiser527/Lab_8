@@ -322,6 +322,14 @@
     <Compile Include="Migrations\20251204111717_AddQuizText.Designer.cs">
       <DependentUpon>20251204111717_AddQuizText.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20251212074507_AddQuizTime.cs" />
+    <Compile Include="Migrations\20251212074507_AddQuizTime.Designer.cs">
+      <DependentUpon>20251212074507_AddQuizTime.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20251212081349_AddHistoryRemainingSeconds.cs" />
+    <Compile Include="Migrations\20251212081349_AddHistoryRemainingSeconds.Designer.cs">
+      <DependentUpon>20251212081349_AddHistoryRemainingSeconds.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\QuizDBContextModelSnapshot.cs" />
     <Compile Include="Models\Answer.cs" />
     <Compile Include="Models\Category.cs" />

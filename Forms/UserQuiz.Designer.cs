@@ -39,6 +39,7 @@ namespace Lab_8
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.leftPanel = new System.Windows.Forms.Panel();
             this.flpQuestion = new System.Windows.Forms.FlowLayoutPanel();
+            this.timeLabel = new System.Windows.Forms.Label();
             this.headerPanel.SuspendLayout();
             this.mainPanel.SuspendLayout();
             this.rightPanel.SuspendLayout();
@@ -49,6 +50,7 @@ namespace Lab_8
             // headerPanel
             // 
             this.headerPanel.BackColor = System.Drawing.Color.White;
+            this.headerPanel.Controls.Add(this.timeLabel);
             this.headerPanel.Controls.Add(this.quizNameLabel);
             this.headerPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.headerPanel.Location = new System.Drawing.Point(0, 0);
@@ -138,6 +140,17 @@ namespace Lab_8
             this.flpQuestion.Size = new System.Drawing.Size(314, 498);
             this.flpQuestion.TabIndex = 0;
             // 
+            // timeLabel
+            // 
+            this.timeLabel.AutoSize = true;
+            this.timeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 19.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.timeLabel.ForeColor = System.Drawing.Color.Red;
+            this.timeLabel.Location = new System.Drawing.Point(785, 18);
+            this.timeLabel.Name = "timeLabel";
+            this.timeLabel.Size = new System.Drawing.Size(107, 39);
+            this.timeLabel.TabIndex = 1;
+            this.timeLabel.Text = "00:00";
+            // 
             // UserQuiz
             // 
             this.ClientSize = new System.Drawing.Size(900, 600);
@@ -159,5 +172,7 @@ namespace Lab_8
         }
 
         #endregion
+
+        private Label timeLabel;
     }
 }

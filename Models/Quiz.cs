@@ -20,6 +20,9 @@ namespace Lab_8.Models
         public int CategoryId { get; set; }
 
         [Required]
+        public int TimeSeconds { get; set; }
+
+        [Required]
         [MaxLength(100)]
         public string Difficulty { get; set; }
 

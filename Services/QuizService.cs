@@ -26,12 +26,12 @@ namespace Lab_8.Services
 
         private QuizService() { }
 
-
         public async Task<PaginatedResult<Quiz>> GetListQuiz(
             int pageSize = 100,
             int pageNumber = 1,
             string name = null,
-            List<int> categoryIds = null)
+            List<int> categoryIds = null,
+            string status = null)
         {
             using (var context = new QuizDBContext())
             {
@@ -50,6 +50,18 @@ namespace Lab_8.Services
 
                 if (categoryIds != null && categoryIds.Any())
                     query = query.Where(q => categoryIds.Contains(q.CategoryId));
+
+                if (!string.IsNullOrEmpty(status) && status != "All")
+                {
+                    bool wantFinished = status == "Finished";
+
+                    query = query.Where(q =>
+                        q.Histories.Any() &&               
+                        q.Histories
+                            .OrderByDescending(h => h.Id)
+                            .FirstOrDefault().IsFinish == wantFinished
+                    );
+                }
 
                 int totalCount = await query.CountAsync();
                 int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
@@ -135,7 +147,7 @@ namespace Lab_8.Services
             }
         }
 
-        public async Task UpdateQuizText(int quizId, string text = null)
+        public async Task UpdateQuizTextAndTime(int quizId, int time, string text = null)
         {
             using (var context = new QuizDBContext())
             {
@@ -148,6 +160,7 @@ namespace Lab_8.Services
                 }
 
                 existingQuiz.Text = string.IsNullOrEmpty(text) ? null : text;
+                existingQuiz.TimeSeconds = time;    
 
                 await context.SaveChangesAsync();   
             }

@@ -31,6 +31,7 @@
             this.userFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.quizFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.tpQuestionAnswer = new System.Windows.Forms.TabPage();
+            this.quizRichText = new System.Windows.Forms.RichTextBox();
             this.panel8 = new System.Windows.Forms.Panel();
             this.label9 = new System.Windows.Forms.Label();
             this.panel7 = new System.Windows.Forms.Panel();
@@ -144,7 +145,9 @@
             this.categoryNamePanel = new System.Windows.Forms.Panel();
             this.txbCategoryName = new System.Windows.Forms.TextBox();
             this.label17 = new System.Windows.Forms.Label();
-            this.quizRichText = new System.Windows.Forms.RichTextBox();
+            this.nmTime = new System.Windows.Forms.NumericUpDown();
+            this.panel6 = new System.Windows.Forms.Panel();
+            this.Time = new System.Windows.Forms.Label();
             this.tpQuestionAnswer.SuspendLayout();
             this.panel7.SuspendLayout();
             this.listQuizPanel.SuspendLayout();
@@ -187,6 +190,8 @@
             this.panel5.SuspendLayout();
             this.categoryIsActivePanel.SuspendLayout();
             this.categoryNamePanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nmTime)).BeginInit();
+            this.panel6.SuspendLayout();
             this.SuspendLayout();
             // 
             // userFileDialog
@@ -199,6 +204,7 @@
             // 
             // tpQuestionAnswer
             // 
+            this.tpQuestionAnswer.Controls.Add(this.panel6);
             this.tpQuestionAnswer.Controls.Add(this.quizRichText);
             this.tpQuestionAnswer.Controls.Add(this.panel8);
             this.tpQuestionAnswer.Controls.Add(this.label9);
@@ -209,6 +215,14 @@
             this.tpQuestionAnswer.TabIndex = 2;
             this.tpQuestionAnswer.Text = "Question-Answer";
             this.tpQuestionAnswer.UseVisualStyleBackColor = true;
+            // 
+            // quizRichText
+            // 
+            this.quizRichText.Location = new System.Drawing.Point(646, 6);
+            this.quizRichText.Name = "quizRichText";
+            this.quizRichText.Size = new System.Drawing.Size(397, 145);
+            this.quizRichText.TabIndex = 7;
+            this.quizRichText.Text = "";
             // 
             // panel8
             // 
@@ -1387,13 +1401,37 @@
             this.label17.TabIndex = 0;
             this.label17.Text = "Name:";
             // 
-            // quizRichText
+            // nmTime
             // 
-            this.quizRichText.Location = new System.Drawing.Point(646, 6);
-            this.quizRichText.Name = "quizRichText";
-            this.quizRichText.Size = new System.Drawing.Size(397, 145);
-            this.quizRichText.TabIndex = 7;
-            this.quizRichText.Text = "";
+            this.nmTime.Location = new System.Drawing.Point(73, 12);
+            this.nmTime.Maximum = new decimal(new int[] {
+            1569325056,
+            23283064,
+            0,
+            0});
+            this.nmTime.Name = "nmTime";
+            this.nmTime.Size = new System.Drawing.Size(86, 28);
+            this.nmTime.TabIndex = 8;
+            // 
+            // panel6
+            // 
+            this.panel6.BackColor = System.Drawing.Color.White;
+            this.panel6.Controls.Add(this.Time);
+            this.panel6.Controls.Add(this.nmTime);
+            this.panel6.Location = new System.Drawing.Point(463, 90);
+            this.panel6.Name = "panel6";
+            this.panel6.Size = new System.Drawing.Size(177, 54);
+            this.panel6.TabIndex = 9;
+            // 
+            // Time
+            // 
+            this.Time.AutoSize = true;
+            this.Time.Cursor = System.Windows.Forms.Cursors.SizeNWSE;
+            this.Time.Location = new System.Drawing.Point(12, 15);
+            this.Time.Name = "Time";
+            this.Time.Size = new System.Drawing.Size(55, 22);
+            this.Time.TabIndex = 3;
+            this.Time.Text = "Time:";
             // 
             // Admin
             // 
@@ -1471,6 +1509,9 @@
             this.categoryIsActivePanel.PerformLayout();
             this.categoryNamePanel.ResumeLayout(false);
             this.categoryNamePanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nmTime)).EndInit();
+            this.panel6.ResumeLayout(false);
+            this.panel6.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1593,5 +1634,8 @@
         private System.Windows.Forms.ComboBox cbCategoryIsActive;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.RichTextBox quizRichText;
+        private System.Windows.Forms.Panel panel6;
+        private System.Windows.Forms.NumericUpDown nmTime;
+        private System.Windows.Forms.Label Time;
     }
 }

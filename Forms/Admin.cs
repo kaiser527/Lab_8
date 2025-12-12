@@ -873,7 +873,7 @@ namespace Lab_8.Forms
                 panel8, listQuizPanel,
                 //Quiz
                 quizDifficultyPanel, quizImagePanel, quizPaginatePanel,
-                quizNamePanel, quizTablePanel, quizCategoryPanel,
+                quizNamePanel, quizTablePanel, quizCategoryPanel, panel6,
                 //Role
                 roleNamePanel, roleIsActivePanel, flpRole,
                 rolePaginatePanel, roleTablePanel, moduleListPanel,
@@ -1769,6 +1769,7 @@ namespace Lab_8.Forms
                 await LoadQuestionsByQuizId(fullQuiz.Id);
 
                 quizRichText.Text = fullQuiz.Text;
+                nmTime.Value = fullQuiz.TimeSeconds;    
             }
         }
 
@@ -1778,7 +1779,7 @@ namespace Lab_8.Forms
             {
                 await QuestionService.Instance.UpsertQuestionAnswer(questionList, selectedQuizId);
 
-                await QuizService.Instance.UpdateQuizText(selectedQuizId, quizRichText.Text);
+                await QuizService.Instance.UpdateQuizTextAndTime(selectedQuizId, int.Parse(nmTime.Value.ToString()),quizRichText.Text);
 
                 RenderQuestionList();
             }

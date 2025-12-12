@@ -183,7 +183,8 @@ namespace Lab_8.Utils
                     Name = "English Basics Quiz",
                     Difficulty = "Easy",
                     Image = File.ReadAllBytes(Path.Combine(quizImg, "general.jpg")),
-                    CategoryId = generalCategory.Id
+                    CategoryId = generalCategory.Id,
+                    TimeSeconds = 60,
                 };
 
                 context.Quizzes.Add(quiz);

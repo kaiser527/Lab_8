@@ -26,7 +26,8 @@ namespace Lab_8.Forms
 
         private bool _formReady = false;
 
-        private readonly List<int> _categoryIds = new List<int>();    
+        private readonly List<int> _categoryIds = new List<int>();
+        private string _status;
 
         public Home()
         {
@@ -84,17 +85,16 @@ namespace Lab_8.Forms
 
             // --- Layout variables ---
             int xStart = 23;
-            int y = 60; // start below title
+            int y = 60;
             int spacingX = 30;
             int spacingY = 15;
             int col = 0;
 
             int cbWidth = (quizFilterPanel.Width - xStart * 2 - spacingX) / 2;
-            int cbHeight = 50; // height for a checkbox
+            int cbHeight = 50;
 
             foreach (var category in result.Items.Where(c => c.IsActive))
             {
-                // Panel container
                 Panel cbContainer = new Panel
                 {
                     Width = cbWidth + 20,
@@ -105,17 +105,15 @@ namespace Lab_8.Forms
 
                 UIStyle.RoundPanel(cbContainer, 15);
 
-                // Checkbox
                 CheckBox cb = new CheckBox
                 {
                     Text = category.Name,
                     Tag = category,
                     Font = new Font("Segoe UI", 10.8f, FontStyle.Regular),
-                    AutoSize = true, // let Windows handle checkbox + text size
-                    Location = new Point(5, (cbContainer.Height - 20) / 2 - 3), // vertically centered
+                    AutoSize = true,
+                    Location = new Point(5, (cbContainer.Height - 20) / 2 - 3),
                 };
 
-                // Hover effect on panel
                 cbContainer.MouseEnter += (s, e) => cbContainer.BackColor = Color.AliceBlue;
                 cbContainer.MouseLeave += (s, e) => cbContainer.BackColor = Color.White;
 
@@ -132,43 +130,123 @@ namespace Lab_8.Forms
                 }
             }
 
-            // --- Reset Categories Button ---
-            Button btnResetCategories = new Button
+            Label historyStatusTitle = new Label
             {
-                Text = "Reset Categories",
-                Width = cbWidth * 2 + spacingX, // span across two columns
+                Text = "History Status",
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                ForeColor = Color.FromArgb(0, 120, 215),
+                AutoSize = false,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Width = quizFilterPanel.Width - 40,
+                Height = 40,
+                Location = new Point(20, y - 10)
+            };
+            quizFilterPanel.Controls.Add(historyStatusTitle);
+
+            y += 40;
+
+            var statusOptions = new[] { "All", "Finished", "In Progress" };
+
+            int statusCol = 0;
+            int statusRowHeight = cbHeight;
+
+            // You need a list to uncheck others
+            List<RadioButton> statusRadios = new List<RadioButton>();
+
+            foreach (var status in statusOptions)
+            {
+                Panel statusPanel = new Panel
+                {
+                    Width = cbWidth + 20,
+                    Height = statusRowHeight,
+                    Location = new Point(xStart + (cbWidth + spacingX) * statusCol - 10, y),
+                    BackColor = Color.White,
+                    Tag = status
+                };
+
+                UIStyle.RoundPanel(statusPanel, 15);
+
+                RadioButton rb = new RadioButton
+                {
+                    Text = status,
+                    Font = new Font("Segoe UI", 10.8f, FontStyle.Regular),
+                    AutoSize = true,
+                    Location = new Point(5, (statusPanel.Height - 20) / 2 - 3),
+                    Tag = status
+                };
+
+                statusRadios.Add(rb);
+
+                statusPanel.MouseEnter += (s, e) => statusPanel.BackColor = Color.AliceBlue;
+                statusPanel.MouseLeave += (s, e) => statusPanel.BackColor = Color.White;
+
+                rb.CheckedChanged += async (s, e) =>
+                {
+                    if (!rb.Checked) return;
+
+                    // Uncheck others manually (because not in same GroupBox)
+                    foreach (var other in statusRadios)
+                        if (other != rb)
+                            other.Checked = false;
+
+                    _status = status;
+                    _currentPageQuiz = 1;
+                    await LoadQuiz();
+                };
+
+                statusPanel.Controls.Add(rb);
+                quizFilterPanel.Controls.Add(statusPanel);
+
+                statusCol++;
+                if (statusCol >= 2)
+                {
+                    statusCol = 0;
+                    y += statusRowHeight + spacingY;
+                }
+            }
+
+            // --- Reset Categories Button ---
+            Button btnResetFilter = new Button
+            {
+                Text = "Reset Filter",
+                Width = cbWidth * 2 + spacingX,
                 Height = 35,
-                Top = 260, // some extra spacing
+                Top = 424,
                 Left = xStart,
-                BackColor = Color.FromArgb(220, 53, 69), // Bootstrap-like red
+                BackColor = Color.FromArgb(220, 53, 69),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 Cursor = Cursors.Hand
             };
 
-            UIStyle.ModernUIButton(btnResetCategories, Color.FromArgb(200, 35, 51), Color.FromArgb(220, 53, 69));
+            UIStyle.ModernUIButton(btnResetFilter, Color.FromArgb(200, 35, 51), Color.FromArgb(220, 53, 69));
 
-            // Click event: reset selected categories
-            btnResetCategories.Click += async (s, e) =>
+            btnResetFilter.Click += async (s, e) =>
             {
                 _categoryIds.Clear();
 
-                // Temporarily remove CheckedChanged events
                 foreach (Panel panel in quizFilterPanel.Controls.OfType<Panel>())
                 {
                     if (panel.Controls[0] is CheckBox cbx)
                     {
-                        cbx.CheckedChanged -= Checkbox_CheckedChanged; // detach handler
+                        cbx.CheckedChanged -= Checkbox_CheckedChanged;
                         cbx.Checked = false;
-                        cbx.CheckedChanged += Checkbox_CheckedChanged; // reattach handler
+                        cbx.CheckedChanged += Checkbox_CheckedChanged;
+                    }
+                    if(panel.Controls[0] is RadioButton rb)
+                    {
+                        foreach (var other in statusRadios)
+                            if (other != rb)
+                                other.Checked = false;
+
+                        _status = null;
                     }
                 }
-
                 _currentPageQuiz = 1;
                 await LoadQuiz();
             };
-            quizFilterPanel.Controls.Add(btnResetCategories);
+            quizFilterPanel.Controls.Add(btnResetFilter);
         }
 
         public async Task LoadQuiz()
@@ -176,10 +254,11 @@ namespace Lab_8.Forms
             ShowQuizSkeletonLoader(_pageSizeQuiz);
 
             var result = await QuizService.Instance.GetListQuiz(
-                _pageSizeQuiz, 
+                _pageSizeQuiz,
                 _currentPageQuiz,
                 txbSearchQuiz.Text == "Search quiz" ? null : txbSearchQuiz.Text,
-                _categoryIds);
+                _categoryIds,
+                _status);
 
             Helper.StopShimmerAnimation();
 
@@ -221,9 +300,8 @@ namespace Lab_8.Forms
         {
             var user = UserService.Instance.User;
 
-            ShowHistorySkeleton(_pageSizeHistory);
+            ShowHistorySkeleton(_pageSizeHistory + 1);
 
-            // --- Fetch filtered history ---
             var result = await HistoryService.Instance.GetListHistoryByQuizIdAndUserId(
                 quizId,
                 user.Id,
@@ -233,11 +311,25 @@ namespace Lab_8.Forms
                 _timeFinish
             );
 
-            Helper.StopShimmerAnimation();
+            var quizTask = QuizService.Instance.GetQuizById(quizId);
+            var answersTasks = result.Items
+                .Select(h => UserService.Instance.GetUserAnswersByHistory(h.Id))
+                .ToList();
 
+            var allTasks = new List<Task>
+            {
+                quizTask
+            };
+            allTasks.AddRange(answersTasks);
+
+            await Task.WhenAll(allTasks);
+
+            var quiz = quizTask.Result;
+            var allUserAnswers = answersTasks.Select(t => t.Result).ToList();
+
+            Helper.StopShimmerAnimation();
             historyPanel.Controls.Clear();
 
-            // Title
             Label lblTitle = new Label
             {
                 Text = "Quiz History",
@@ -249,19 +341,17 @@ namespace Lab_8.Forms
             };
             historyPanel.Controls.Add(lblTitle);
 
-            // Base container (FlowLayoutPanel)
             var flow = new FlowLayoutPanel
             {
                 Dock = DockStyle.Fill,
                 AutoScroll = true,
                 FlowDirection = FlowDirection.TopDown,
                 WrapContents = false,
-                Padding = new Padding(15, 52, 15, 15), // keep your padding
+                Padding = new Padding(15, 52, 15, 15),
                 BackColor = Color.WhiteSmoke
             };
             historyPanel.Controls.Add(flow);
 
-            // --- Create DateTimePickers panel (always visible) ---
             Panel datePickerPanel = new Panel
             {
                 Width = flow.ClientSize.Width - 30,
@@ -313,21 +403,17 @@ namespace Lab_8.Forms
                 Text = "Reset Filter",
                 Width = 80,
                 Height = 26,
-                BackColor = Color.FromArgb(220, 53, 69), // Bootstrap-style red
+                BackColor = Color.FromArgb(220, 53, 69),
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font("Segoe UI", 8.3f, FontStyle.Bold),
                 ForeColor = Color.White,
                 Cursor = Cursors.Hand
             };
-
-            // Rounded edges
             btnReset.FlatAppearance.BorderSize = 0;
 
-            // Hover effect: slightly darker red
             btnReset.MouseEnter += (s, e) => btnReset.BackColor = Color.FromArgb(200, 35, 51);
             btnReset.MouseLeave += (s, e) => btnReset.BackColor = Color.FromArgb(220, 53, 69);
 
-            // Center the button in the panel
             btnReset.Left = (resetPanel.Width - btnReset.Width) / 2;
             btnReset.Top = (resetPanel.Height - btnReset.Height) / 2;
 
@@ -344,14 +430,12 @@ namespace Lab_8.Forms
             resetPanel.Controls.Add(btnReset);
             flow.Controls.Add(resetPanel);
 
-
-            // --- Empty state ---
             if (result.Items == null || !result.Items.Any())
             {
                 Panel emptyPanel = new Panel
                 {
                     Width = flow.ClientSize.Width - 30,
-                    Height = 300, // set a reasonable height
+                    Height = 300,
                     BackColor = Color.WhiteSmoke
                 };
 
@@ -380,11 +464,15 @@ namespace Lab_8.Forms
                 emptyPanel.Controls.Add(lblEmpty);
 
                 flow.Controls.Add(emptyPanel);
+
+                return result.TotalPages;
             }
 
-            // --- Render history items ---
-            foreach (var h in result.Items)
+            for (int i = 0; i < result.Items.Count(); i++)
             {
+                var h = result.Items.ToList()[i];
+                var userAnswers = allUserAnswers[i];
+
                 var item = new Panel
                 {
                     Width = flow.ClientSize.Width - 40,
@@ -395,8 +483,6 @@ namespace Lab_8.Forms
                     BorderStyle = BorderStyle.None,
                     Cursor = Cursors.Hand
                 };
-
-                // Optional: rounded corners + shadow
                 item.Paint += (s, e) =>
                 {
                     var g = e.Graphics;
@@ -413,58 +499,53 @@ namespace Lab_8.Forms
                         g.DrawRoundedRectangle(borderPen, rect, 8);
                     }
                 };
-
                 item.Click += (s, e) =>
                 {
                     if (!h.IsFinish) return;
-
-                    UserQuiz quizForm = new UserQuiz(quizId, h.Id, h.Quiz.Category.Name ,this, true); // history mode
-                    quizForm.ShowDialog();                 
+                    UserQuiz quizForm = new UserQuiz(
+                        quizId,
+                        h.Id,
+                        h.Quiz.Category.Name,
+                        h.RemainingSeconds ?? h.Quiz.TimeSeconds,
+                        this,
+                        true
+                    );
+                    quizForm.ShowDialog();
                 };
 
-                // Labels
+                // Date label
                 Label lblDate = new Label
                 {
                     Text = $"📅 {(h.IsFinish ? h.TimeFinish.ToString("yyyy-MM-dd HH:mm") : h.TimeStart.ToString("yyyy-MM-dd HH:mm"))}",
                     AutoSize = true,
-                    Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                    Font = new Font("Segoe UI", 9),
                     ForeColor = Color.DimGray,
                     Left = 10,
                     Top = 10
                 };
 
-                var quiz = await QuizService.Instance.GetQuizById(quizId);
-                var userAnswers = await UserService.Instance.GetUserAnswersByHistory(h.Id);
-
-                // Count correct answers
+                // Score
                 int correctCount = 0;
-                int totalCount = 0; 
+                int totalCount = quiz.Questions.Count(q => q.Answers.Any(a => a.IsCorrect));
 
                 if (h.IsFinish)
                 {
                     foreach (var question in quiz.Questions)
                     {
-                        var correctAnswer = question.Answers?.FirstOrDefault(a => a.IsCorrect);
-
-                        if (correctAnswer == null)
-                            continue;
-
-                        totalCount++; 
-
-                        // Get user's answer
+                        var correct = question.Answers.FirstOrDefault(a => a.IsCorrect);
                         var userAnswer = userAnswers
-                            .FirstOrDefault(ua => ua.Answer != null && ua.Answer.QuestionId == question.Id)
+                            .FirstOrDefault(ua => ua.Answer?.QuestionId == question.Id)
                             ?.Answer;
 
-                        if (userAnswer != null && userAnswer.Id == correctAnswer.Id)
+                        if (correct != null && userAnswer?.Id == correct.Id)
                             correctCount++;
                     }
                 }
 
-                // Calculate percentage
-                double percentage = totalCount > 0 ? (double)correctCount / totalCount * 100 : 0;
+                double percentage = totalCount > 0
+                    ? (double)correctCount / totalCount * 100
+                    : 0;
 
-                // Create label
                 Label lblScore = new Label
                 {
                     Text = $"⭐ Score: {Math.Round(percentage, 2)}%",
@@ -472,7 +553,7 @@ namespace Lab_8.Forms
                     Font = new Font("Segoe UI", 9, FontStyle.Bold),
                     ForeColor = Color.FromArgb(0, 120, 215),
                     Left = 10,
-                    Top = 35
+                    Top = 26
                 };
 
                 Label lblStatus = new Label
@@ -482,13 +563,28 @@ namespace Lab_8.Forms
                     Font = new Font("Segoe UI", 9, FontStyle.Italic),
                     ForeColor = h.IsFinish ? Color.FromArgb(0, 200, 83) : Color.FromArgb(255, 193, 7),
                     Anchor = AnchorStyles.Top | AnchorStyles.Right,
-                    Left = item.Width - (h.IsFinish ? 80 : 94),
+                    Left = item.Width - 90,
                     Top = 25
+                };
+
+                // Remaining time
+                int secondsLeft = h.RemainingSeconds ?? h.Quiz.TimeSeconds;
+                TimeSpan ts = TimeSpan.FromSeconds(secondsLeft);
+
+                Label lblRemaining = new Label
+                {
+                    Text = $"⏱ Remaining: {ts:mm\\:ss}",
+                    AutoSize = true,
+                    Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(255, 87, 34),
+                    Left = 10,
+                    Top = 42
                 };
 
                 item.Controls.Add(lblDate);
                 item.Controls.Add(lblScore);
                 item.Controls.Add(lblStatus);
+                item.Controls.Add(lblRemaining);
 
                 flow.Controls.Add(item);
             }
@@ -574,9 +670,9 @@ namespace Lab_8.Forms
             // Check if user has done this quiz before
             var user = UserService.Instance.User;
             var histories = (await HistoryService.Instance.GetListHistoryByQuizIdAndUserId(
-                quiz.Id, 
-                user.Id, 
-                1000, 
+                quiz.Id,
+                user.Id,
+                1000,
                 1
             )).Items;
             var latestHistory = histories?.FirstOrDefault();
@@ -654,7 +750,7 @@ namespace Lab_8.Forms
 
                 historyToUse.Quiz = quiz;
 
-                UserQuiz quizForm = new UserQuiz(quiz.Id, historyToUse.Id, historyToUse.Quiz.Category.Name, this);
+                UserQuiz quizForm = new UserQuiz(quiz.Id, historyToUse.Id, historyToUse.Quiz.Category.Name, historyToUse.RemainingSeconds ?? historyToUse.Quiz.TimeSeconds, this);
                 quizForm.ShowDialog();
 
                 await HandleClickQuiz(quiz.Id);
@@ -666,7 +762,6 @@ namespace Lab_8.Forms
             card.Controls.Add(lblDiff);
             card.Controls.Add(btnEnter);
 
-            // ✅ Proper hover effect for entire card
             void SetHoverEffect(Control ctrl)
             {
                 ctrl.MouseEnter += (s, e) => card.BackColor = Color.AliceBlue;
@@ -693,7 +788,7 @@ namespace Lab_8.Forms
 
         private async Task HandleClickQuiz(int quizId)
         {
-            _currentPageHistory = 1; 
+            _currentPageHistory = 1;
             await RenderHistoryPagination(quizId);
         }
 
@@ -707,7 +802,7 @@ namespace Lab_8.Forms
                 _totalPagesHistory,
                 async (newPage) =>
                 {
-                    _currentPageHistory = newPage; 
+                    _currentPageHistory = newPage;
                     await RenderHistoryPagination(quizId);
                 }
             );
@@ -736,7 +831,7 @@ namespace Lab_8.Forms
                 AutoScroll = true,
                 FlowDirection = FlowDirection.TopDown,
                 WrapContents = false,
-                Padding = new Padding(15, 45, 15, 15),
+                Padding = new Padding(15, 40, 15, 15),
                 BackColor = Color.WhiteSmoke
             };
             historyPanel.Controls.Add(flow);
@@ -943,7 +1038,7 @@ namespace Lab_8.Forms
         {
             Admin admin = new Admin(this);
 
-            admin.ShowDialog(); 
+            admin.ShowDialog();
         }
 
         private void userProfileToolStripMenuItem_Click(object sender, EventArgs e)

@@ -4,14 +4,16 @@ using Lab_8.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Lab_8.Migrations
 {
     [DbContext(typeof(QuizDBContext))]
-    partial class QuizDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251212074507_AddQuizTime")]
+    partial class AddQuizTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,9 +76,6 @@ namespace Lab_8.Migrations
                         .HasColumnType("bit");
 
                     b.Property<int>("QuizId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("RemainingSeconds")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("TimeFinish")

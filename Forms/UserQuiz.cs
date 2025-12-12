@@ -28,7 +28,10 @@ namespace Lab_8
         private readonly bool _isHistoryView;
         private Question _currentQuestion;
 
-        public UserQuiz(int quizId, int historyId, string category, Home home, bool isHistoryView = false)
+        private int _remainingSeconds;
+        private Timer _timer;   
+
+        public UserQuiz(int quizId, int historyId, string category, int remainingSeconds, Home home, bool isHistoryView = false)
         {
             InitializeComponent();
             _quizId = quizId;
@@ -36,11 +39,22 @@ namespace Lab_8
             _isHistoryView = isHistoryView;
             _home = home;
             _category = category;
+            _remainingSeconds = remainingSeconds;
             StylePanels();
 
             Load += UserQuiz_Load;
 
-            FormClosing += (s, e) => Helper.StopAudio(_currentQuestion);
+            FormClosing += (s, e) => 
+            {
+                Helper.StopAudio(_currentQuestion);
+
+                if (_timer != null)
+                {
+                    _timer.Stop();
+                    _timer.Dispose();
+                    _timer = null;
+                }
+            };
         }
 
         private void StylePanels()
@@ -68,6 +82,15 @@ namespace Lab_8
             if (_quiz == null) return;
 
             quizNameLabel.Text = _quiz.Name;
+
+            if (!_isHistoryView)
+            {
+                StartCountdown();
+            }
+            else
+            {
+                timeLabel.Visible = false;
+            }
 
             flpQuestion.AutoScroll = true;
             flpQuestion.WrapContents = true;
@@ -116,6 +139,121 @@ namespace Lab_8
         }
         #endregion
 
+        #region Timer
+        private void StartCountdown()
+        {
+            timeLabel.Text = TimeSpan.FromSeconds(_remainingSeconds).ToString(@"mm\:ss");
+
+            _timer = new Timer
+            {
+                Interval = 1000
+            };
+            _timer.Tick += Timer_Tick;
+            _timer.Start();
+        }
+
+        private async void Timer_Tick(object sender, EventArgs e)
+        {
+            if (_remainingSeconds <= 0)
+            {
+                await SubmitQuiz(true);
+                return;
+            }
+
+            _remainingSeconds--;
+
+            timeLabel.Text = TimeSpan.FromSeconds(_remainingSeconds).ToString(@"mm\:ss");
+
+            await HistoryService.Instance.UpdateRemainingTime(_historyId, _remainingSeconds);
+        }
+        #endregion
+
+        #region Submit Quiz
+        private async Task SubmitQuiz(bool isTimeUp)
+        {
+            if (_isQuizFinished) return;
+            _isQuizFinished = true;
+
+            if (_timer != null)
+            {
+                _timer.Stop();
+                _timer.Dispose();
+                _timer = null;
+            }
+
+            if (_currentQuestion != null) Helper.StopAudio(_currentQuestion);
+
+            // Refresh UI first
+            HighlightCurrentQuestionButton();
+            DisplayQuestion(_currentQuestionIndex);
+
+            // Batch save all answers to DB
+            foreach (var ua in _userSelectedAnswers)
+            {
+                await UserService.Instance.SaveUserAnswerEachCheck(new UserAnswer
+                {
+                    UserId = UserService.Instance.User.Id,
+                    HistoryId = _historyId,
+                    AnswerId = ua.Value.Id
+                });
+            }
+
+            int correctCount = 0;
+            int totalCount = 0;
+
+            foreach (Control control in flpQuestion.Controls)
+            {
+                if (control is Button btn)
+                {
+                    int indexQ = (int)btn.Tag;
+                    var question = _quiz.Questions.ToList()[indexQ];
+
+                    var correctAnswer = question.Answers?.FirstOrDefault(a => a.IsCorrect);
+
+                    if (correctAnswer == null)
+                    {
+                        btn.BackColor = Color.Gray;
+                        btn.ForeColor = Color.White;
+                        continue;
+                    }
+
+                    totalCount++;
+
+                    _userSelectedAnswers.TryGetValue(question.Id, out var userAnswer);
+
+                    if (userAnswer != null && userAnswer.Id == correctAnswer.Id)
+                    {
+                        btn.BackColor = Color.LimeGreen;
+                        correctCount++;
+                    }
+                    else
+                    {
+                        btn.BackColor = Color.Red;
+                    }
+
+                    btn.ForeColor = Color.White;
+                }
+            }
+
+            // Submit quiz history
+            await HistoryService.Instance.SubmitQuizHistory(new History
+            {
+                Id = _historyId,
+                QuizId = _quizId
+            });
+
+            double scorePercentage = totalCount > 0 ? (double)correctCount / totalCount * 100 : 0;
+            bool confirm = Confirmation.ShowConfirm(
+                isTimeUp ? "Time's Up!" : "Quiz Completed",
+                $"Your final score is {Math.Round(scorePercentage, 2)}%. Do you want to close the quiz?");
+
+            if (confirm) Close();
+
+            await _home.LoadQuiz();
+            await _home.ShowHistoryAsync(_quizId);
+        }
+        #endregion
+
         #region Highlight Question Button
         private void HighlightCurrentQuestionButton()
         {
@@ -151,7 +289,6 @@ namespace Lab_8
                         btn.FlatAppearance.BorderColor = Color.Black;
                         continue;
                     }
-
 
                     if (index == _currentQuestionIndex)
                     {
@@ -391,81 +528,7 @@ namespace Lab_8
             };
             styleButton(btnFinish);
 
-            btnFinish.Click += async (s, e) =>
-            {
-                _isQuizFinished = true;
-
-                if(_currentQuestion != null) Helper.StopAudio(_currentQuestion);
-
-                // Refresh UI first
-                HighlightCurrentQuestionButton();
-                DisplayQuestion(_currentQuestionIndex);
-
-                // Batch save all answers to DB
-                foreach (var ua in _userSelectedAnswers)
-                {
-                    await UserService.Instance.SaveUserAnswerEachCheck(new UserAnswer
-                    {
-                        UserId = UserService.Instance.User.Id,
-                        HistoryId = _historyId,
-                        AnswerId = ua.Value.Id
-                    });
-                }
-
-                int correctCount = 0;
-                int totalCount = 0; 
-
-                foreach (Control control in flpQuestion.Controls)
-                {
-                    if (control is Button btn)
-                    {
-                        int indexQ = (int)btn.Tag;
-                        var question = _quiz.Questions.ToList()[indexQ];
-                      
-                        var correctAnswer = question.Answers?.FirstOrDefault(a => a.IsCorrect);
-
-                        if (correctAnswer == null)
-                        {
-                            btn.BackColor = Color.Gray; 
-                            btn.ForeColor = Color.White;
-                            continue;
-                        }
-
-                        totalCount++;
-
-                        _userSelectedAnswers.TryGetValue(question.Id, out var userAnswer);
-
-                        if (userAnswer != null && userAnswer.Id == correctAnswer.Id)
-                        {
-                            btn.BackColor = Color.LimeGreen;
-                            correctCount++;
-                        }
-                        else
-                        {
-                            btn.BackColor = Color.Red;
-                        }
-
-                        btn.ForeColor = Color.White;
-                    }
-                }
-
-                // Submit quiz history
-                await HistoryService.Instance.SubmitQuizHistory(new History
-                {
-                    Id = _historyId,
-                    QuizId = _quizId
-                });
-
-                double scorePercentage = totalCount > 0 ? (double)correctCount / totalCount * 100 : 0;
-                bool confirm = Confirmation.ShowConfirm(
-                    "Submit quiz successfully",
-                    $"Your final score is {Math.Round(scorePercentage, 2)}%. Do you want to close the quiz?");
-
-                if (confirm) Close();
-
-                await _home.LoadQuiz();
-                await _home.ShowHistoryAsync(_quizId);
-            };
+            btnFinish.Click += async (s, e) => await SubmitQuiz(false);
 
             questionsPanel.Controls.Add(btnFinish);
         }

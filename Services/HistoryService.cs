@@ -1,5 +1,6 @@
 ﻿using Lab_8.Models;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Utilities.Collections;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -99,6 +100,18 @@ namespace Lab_8.Services
             }
         }
 
+        public async Task UpdateRemainingTime(int id, int seconds)
+        {
+            using (var context = new QuizDBContext())
+            {
+                var currentHistory = await context.Histories.FindAsync(id);
+                if (currentHistory == null) return;
+
+                currentHistory.RemainingSeconds = seconds;
+
+                await context.SaveChangesAsync();   
+            }
+        }
     }
 }
 
