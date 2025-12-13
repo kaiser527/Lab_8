@@ -199,13 +199,11 @@ namespace Lab_8.Services
         {
             using (var context = new QuizDBContext())
             {
-                // Get the QuestionId for the selected AnswerId
                 var questionId = await context.Answers
                     .Where(a => a.Id == userAnswer.AnswerId)
                     .Select(a => a.QuestionId)
                     .FirstOrDefaultAsync();
 
-                // Find existing UserAnswer for this user, history, and question
                 var existing = await context.UserAnswers
                     .Include(u => u.Answer)
                     .FirstOrDefaultAsync(u =>
@@ -216,12 +214,10 @@ namespace Lab_8.Services
 
                 if (existing != null)
                 {
-                    // Delete old UserAnswer before inserting new one
                     context.UserAnswers.Remove(existing);
-                    await context.SaveChangesAsync(); // save deletion first
+                    await context.SaveChangesAsync();
                 }
 
-                // Add new UserAnswer
                 context.UserAnswers.Add(new UserAnswer
                 {
                     UserId = userAnswer.UserId,
