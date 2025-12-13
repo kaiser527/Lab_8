@@ -518,7 +518,6 @@ namespace Lab_8
                 if (_currentQuestionIndex < _quiz.Questions.Count - 1)
                 {
                     _currentQuestionIndex++;
-                    HighlightCurrentQuestionButton();
                     DisplayQuestion(_currentQuestionIndex);
                     UpdateProgressBar(_currentQuestionIndex);
                 }
@@ -540,6 +539,8 @@ namespace Lab_8
             btnFinish.Click += async (s, e) => await SubmitQuiz(false);
 
             questionsPanel.Controls.Add(btnFinish);
+
+            HighlightCurrentQuestionButton();
         }
         #endregion
 
