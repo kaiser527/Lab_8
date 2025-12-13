@@ -496,7 +496,6 @@ namespace Lab_8
                 if (_currentQuestionIndex > 0)
                 {
                     _currentQuestionIndex--;
-                    HighlightCurrentQuestionButton();
                     DisplayQuestion(_currentQuestionIndex);
                     UpdateProgressBar(_currentQuestionIndex);
                 }
