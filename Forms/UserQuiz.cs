@@ -235,7 +235,6 @@ namespace Lab_8
                 }
             }
 
-            // Submit quiz history
             await HistoryService.Instance.SubmitQuizHistory(new History
             {
                 Id = _historyId,
@@ -262,26 +261,25 @@ namespace Lab_8
                 if (control is Button btn)
                 {
                     int index = (int)btn.Tag;
+                    var question = _quiz.Questions.ToList()[index];
 
+                    // ===== FINISHED or HISTORY VIEW =====
                     if (_isQuizFinished || _isHistoryView)
                     {
-                        var question = _quiz.Questions.ToList()[index];
-
-                        // Safely get correct answer
                         var correctAnswer = question.Answers.FirstOrDefault(a => a.IsCorrect);
-
                         _userSelectedAnswers.TryGetValue(question.Id, out var userAnswer);
 
-                        if (correctAnswer != null)
+                        if (correctAnswer == null)
                         {
-                            btn.BackColor = (userAnswer != null && userAnswer.Id == correctAnswer.Id)
-                                ? Color.LimeGreen
-                                : Color.Red;
+                            btn.BackColor = Color.Gray;
+                        }
+                        else if (userAnswer != null && userAnswer.Id == correctAnswer.Id)
+                        {
+                            btn.BackColor = Color.LimeGreen;
                         }
                         else
                         {
-                            // If no correct answer is available, use neutral color
-                            btn.BackColor = Color.Gray;
+                            btn.BackColor = Color.Red;
                         }
 
                         btn.ForeColor = Color.White;
@@ -290,11 +288,20 @@ namespace Lab_8
                         continue;
                     }
 
+                    // ===== DURING QUIZ =====
+                    bool isAnswered = _userSelectedAnswers.ContainsKey(question.Id);
+
                     if (index == _currentQuestionIndex)
                     {
                         btn.BackColor = Color.DodgerBlue;
                         btn.ForeColor = Color.White;
                         btn.Font = new Font("Segoe UI", 16, FontStyle.Bold);
+                    }
+                    else if (isAnswered)
+                    {
+                        btn.BackColor = Color.Orange;   
+                        btn.ForeColor = Color.White;
+                        btn.Font = new Font("Segoe UI", 14, FontStyle.Bold);
                     }
                     else
                     {
@@ -423,6 +430,8 @@ namespace Lab_8
                         HistoryId = _historyId,
                         AnswerId = selectedAnswer.Id
                     });
+
+                    HighlightCurrentQuestionButton();
                 };
 
                 questionsPanel.Controls.Add(rb);
